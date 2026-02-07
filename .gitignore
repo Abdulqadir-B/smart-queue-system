@@ -1,0 +1,28 @@
+# Root level gitignore
+
+# Environment variables (CRITICAL)
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+dist/
+build/
+
+#editorconfig
+.copilotrules
