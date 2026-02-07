@@ -1,13 +1,10 @@
-# Smart Queue Management System (SQM)
+﻿# Smart Queue Management System (SQM)
 
-**Minor Project - 5th Semester, 3rd Year**  
-**Status:** Under Development  
-**Type:** Group Project (Individual Contribution)  
 **Primary Use Case:** Government Offices and Public Service Centers
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Project Overview](#project-overview)
 - [Technologies Used](#technologies-used)
@@ -16,12 +13,11 @@
 - [Authentication & Authorization](#authentication--authorization)
 - [System Architecture](#system-architecture)
 - [Installation & Setup](#installation--setup)
-- [Presentation Q&A](#presentation-qa)
 - [Important Technical Details](#important-technical-details)
 
 ---
 
-## 🎯 Project Overview
+##  Project Overview
 
 The Smart Queue Management System (SQM) is a web-based application designed to eliminate physical queues and reduce waiting time in government offices, public service centers, hospitals, banks, and other service-oriented organizations. The system allows customers to join virtual queues remotely, track their position in real-time, and receive notifications when their turn approaches.
 
@@ -39,7 +35,7 @@ A digital queue management system with real-time updates, role-based access cont
 
 ---
 
-## 💻 Technologies Used
+##  Technologies Used
 
 ### **Backend Technologies**
 
@@ -80,7 +76,7 @@ A digital queue management system with real-time updates, role-based access cont
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 ### **1. Multi-Role System**
 
@@ -158,7 +154,7 @@ A digital queue management system with real-time updates, role-based access cont
 
 ---
 
-## 🗄️ Database & Schema Design
+##  -  Database & Schema Design
 
 ### **Database:** MongoDB (NoSQL)
 
@@ -328,15 +324,15 @@ QueueTokens (individual customer tokens)
 
 ---
 
-## 🔐 Authentication & Authorization
+##  Authentication & Authorization
 
 ### **Authentication Flow (Simple Explanation)**
 
 #### **1. User Registration**
 
 ```
-Customer fills form → System validates input → Password is hashed (bcrypt)
-→ User saved to database → Success message returned
+Customer fills form  System validates input  Password is hashed (bcrypt)
+ User saved to database  Success message returned
 ```
 
 **Security Measures:**
@@ -351,10 +347,10 @@ Customer fills form → System validates input → Password is hashed (bcrypt)
 #### **2. User Login**
 
 ```
-User enters credentials → System finds user by email
-→ Compares hashed password → If match, creates JWT token
-→ Token sent to client → Client stores token in localStorage
-→ User logged in
+User enters credentials  System finds user by email
+ Compares hashed password  If match, creates JWT token
+ Token sent to client  Client stores token in localStorage
+ User logged in
 ```
 
 **JWT Token Contains:**
@@ -376,16 +372,16 @@ User enters credentials → System finds user by email
 #### **3. Protected Route Access**
 
 ```
-User makes request → Client sends JWT in Authorization header
-→ Server verifies JWT signature → Extracts user info from token
-→ Checks if user exists and is active → Attaches user to request
-→ Proceeds to route handler
+User makes request  Client sends JWT in Authorization header
+ Server verifies JWT signature  Extracts user info from token
+ Checks if user exists and is active  Attaches user to request
+ Proceeds to route handler
 ```
 
 **Middleware Chain:**
 
 ```javascript
-Request → auth (verify token) → authorize(['admin', 'staff']) → Controller
+Request  auth (verify token)  authorize(['admin', 'staff'])  Controller
 ```
 
 ---
@@ -396,9 +392,9 @@ Request → auth (verify token) → authorize(['admin', 'staff']) → Controller
 
 ```
 Admin (highest privileges)
-  ↓
+  
 Staff (queue management)
-  ↓
+  
 User/Customer (basic access)
 ```
 
@@ -406,23 +402,23 @@ User/Customer (basic access)
 
 | Feature            | Customer | Staff | Admin |
 | ------------------ | -------- | ----- | ----- |
-| Join Queue         | ✅       | ✅    | ✅    |
-| Track Token        | ✅       | ✅    | ✅    |
-| View Queue Status  | ✅       | ✅    | ✅    |
-| Call Next Token    | ❌       | ✅    | ✅    |
-| Complete Service   | ❌       | ✅    | ✅    |
-| Pause/Resume Queue | ❌       | ✅    | ✅    |
-| Reset Queue        | ❌       | ✅    | ✅    |
-| Create Queue       | ❌       | ❌    | ✅    |
-| Delete Queue       | ❌       | ❌    | ✅    |
-| View Analytics     | ❌       | ❌    | ✅    |
+| Join Queue         |        |     |     |
+| Track Token        |        |     |     |
+| View Queue Status  |        |     |     |
+| Call Next Token    |        |     |     |
+| Complete Service   |        |     |     |
+| Pause/Resume Queue |        |     |     |
+| Reset Queue        |        |     |     |
+| Create Queue       |        |     |     |
+| Delete Queue       |        |     |     |
+| View Analytics     |        |     |     |
 
 #### **How Authorization Works:**
 
 1. After authentication, user object is attached to request
 2. Authorization middleware checks user's role
-3. If role matches required roles → Access granted
-4. If role doesn't match → 404 error (hides resource existence for security)
+3. If role matches required roles  Access granted
+4. If role doesn't match  404 error (hides resource existence for security)
 
 ---
 
@@ -431,9 +427,9 @@ User/Customer (basic access)
 Real-time connections also require authentication:
 
 ```
-Client connects → Sends JWT token in handshake
-→ Server verifies token → Attaches user to socket
-→ Connection established with user context
+Client connects  Sends JWT token in handshake
+ Server verifies token  Attaches user to socket
+ Connection established with user context
 ```
 
 **Role-Based Socket Events:**
@@ -445,70 +441,70 @@ Client connects → Sends JWT token in handshake
 
 ---
 
-## 🏗️ System Architecture
+##  -  System Architecture
 
 ### **Architecture Pattern:** MVC (Model-View-Controller)
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    FRONTEND (React)                      │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
-│  │  Pages   │  │Components│  │ Context (State Mgmt) │  │
-│  └──────────┘  └──────────┘  └──────────────────────┘  │
-│         │              │                    │            │
-│         └──────────────┴────────────────────┘            │
-│                        │                                 │
-│                   Services Layer                         │
-│            (API Service, Queue Service)                  │
-└────────────────────────│────────────────────────────────┘
-                         │ HTTP/WebSocket
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│                   BACKEND (Express)                      │
-│  ┌──────────┐  ┌────────────┐  ┌──────────────────┐    │
-│  │  Routes  │→ │Controllers │→ │ Models (Mongoose)│    │
-│  └──────────┘  └────────────┘  └──────────────────┘    │
-│        │              ↓                    ↓             │
-│   ┌────────────┐  ┌──────────────────────────────┐     │
-│   │ Middleware │  │    Socket.io Service         │     │
-│   │  (Auth,    │  │  (Real-time Communication)   │     │
-│   │  Validate) │  └──────────────────────────────┘     │
-│   └────────────┘                                        │
-└────────────────────────│────────────────────────────────┘
-                         │
-                         ↓
-              ┌──────────────────────┐
-              │   MongoDB Database   │
-              │   (smart_queue DB)   │
-              └──────────────────────┘
+
+                    FRONTEND (React)                      
+        
+    Pages     Components   Context (State Mgmt)   
+        
+                                                       
+                     
+                                                         
+                   Services Layer                         
+            (API Service, Queue Service)                  
+
+                          HTTP/WebSocket
+                         
+
+                   BACKEND (Express)                      
+          
+    Routes   Controllers   Models (Mongoose)    
+          
+                                                       
+          
+    Middleware       Socket.io Service              
+     (Auth,        (Real-time Communication)        
+     Validate)        
+                                           
+
+                         
+                         
+              
+                 MongoDB Database   
+                 (smart_queue DB)   
+              
 ```
 
 ### **Request Flow Example: Join Queue**
 
 ```
 1. Customer fills form on Frontend
-   ↓
+   
 2. React component validates input (client-side)
-   ↓
+   
 3. API Service sends POST request to /api/queues/:name/join
-   ↓
+   
 4. Backend receives request
-   ↓
+   
 5. Middleware chain executes:
    - Rate limiter checks request frequency
    - Input sanitization removes dangerous characters
    - Validation middleware checks data format
-   ↓
+   
 6. Controller (joinQueue) processes request:
    - Finds queue in database
    - Checks for duplicate tokens
    - Increments queue counter
    - Creates QueueToken document
-   ↓
+   
 7. Socket.io broadcasts update to all connected clients
-   ↓
+   
 8. Response sent back to client with token details
-   ↓
+   
 9. Frontend displays token number and verification key
 ```
 
@@ -516,15 +512,15 @@ Client connects → Sends JWT token in handshake
 
 ```
 Staff calls next token:
-  Backend updates database → Socket.io emits event
-  → All customers listening to that queue receive update
-  → Customer whose token was called gets notification
-  → UI updates automatically
+  Backend updates database  Socket.io emits event
+   All customers listening to that queue receive update
+   Customer whose token was called gets notification
+   UI updates automatically
 ```
 
 ---
 
-## 📦 Installation & Setup
+##  Installation & Setup
 
 ### **Prerequisites**
 
@@ -587,426 +583,7 @@ npm start
 
 ---
 
-## 🎤 Presentation Q&A
-
-### **General Questions**
-
-#### **Q1: What is the Smart Queue Management System?**
-
-**Answer:** It's a web-based application that digitalizes the traditional physical queue system. Instead of standing in line, customers can join a virtual queue from their devices, track their position in real-time, and get notified when their turn comes. It's designed mainly for government offices where long queues are common.
-
----
-
-#### **Q2: Why did you choose this project?**
-
-**Answer:** I observed long queues and waiting times in government offices causing frustration to citizens. During the pandemic, physical queues also became a health risk. This system solves multiple problems: reduces physical crowding, saves customer time, provides transparency in service delivery, and helps staff manage services efficiently.
-
----
-
-#### **Q3: What problem does your project solve?**
-
-**Answer:**
-
-- Eliminates long physical queues
-- Reduces customer waiting time and uncertainty
-- Provides real-time status updates
-- Enables contactless queue management
-- Helps staff manage multiple queues efficiently
-- Provides analytics for service improvement
-- Improves overall customer satisfaction
-
----
-
-### **Technical Questions**
-
-#### **Q4: Why did you choose MongoDB over SQL databases?**
-
-**Answer:**
-
-- **Flexibility:** Queue data and customer information can vary (some provide phone, some don't). MongoDB's schema-less nature handles this well.
-- **Scalability:** Easy to scale horizontally as queue volume grows.
-- **JSON-like structure:** Works naturally with Node.js and React (JavaScript ecosystem).
-- **Fast reads:** Queue status needs frequent reads; MongoDB's document model is optimized for this.
-- **Real-time data:** Works well with Socket.io for real-time updates.
-
----
-
-#### **Q5: How does real-time communication work?**
-
-**Answer:** We use Socket.io, which creates a persistent connection between the server and clients. When a staff member calls the next token, the server immediately sends an event to all connected customers in that queue. Their screens update automatically without refreshing the page. It's like a live notification system.
-
-**Simple explanation:** Think of it like a WhatsApp group where everyone gets messages instantly. Socket.io does the same for queue updates.
-
----
-
-#### **Q6: Explain the authentication process.**
-
-**Answer:**
-
-1. User registers with email and password
-2. Password is hashed (encrypted in a one-way process) using bcrypt and stored
-3. During login, we compare the entered password's hash with stored hash
-4. If they match, we create a JWT token (like a digital ID card) containing user information
-5. This token is sent to the browser and stored
-6. For every protected action (like creating a queue), the browser sends this token
-7. Server verifies the token and checks user's role before allowing the action
-
-**Security:** We never store the actual password, only the hash. Even if the database is compromised, passwords remain safe.
-
----
-
-#### **Q7: What is JWT and why use it?**
-
-**Answer:** JWT (JSON Web Token) is like a secure digital ID card. When you login, the server creates this token containing your user ID, email, and role. This token is signed with a secret key that only the server knows.
-
-**Why use it:**
-
-- **Stateless:** Server doesn't need to store session information
-- **Secure:** Cannot be tampered with (signature verification)
-- **Self-contained:** Contains all user info needed for authorization
-- **Scalable:** Works great with multiple servers
-
----
-
-#### **Q8: How do you prevent duplicate queue entries?**
-
-**Answer:** Before issuing a token, we check if the customer already has an active token in that queue within the last 24 hours. We match by name and phone/email (if provided). If a duplicate is found, we return their existing token instead of creating a new one. This prevents people from gaming the system by joining multiple times.
-
----
-
-#### **Q9: What security measures have you implemented?**
-
-**Answer:**
-
-1. **Password Security:** Bcrypt hashing with 10 salt rounds
-2. **Authentication:** JWT tokens with expiration
-3. **Authorization:** Role-based access control (RBAC)
-4. **Rate Limiting:** Prevents brute force attacks and API abuse
-5. **Input Validation:** All user inputs are validated and sanitized
-6. **NoSQL Injection Prevention:** MongoDB sanitization middleware
-7. **Security Headers:** Helmet.js sets secure HTTP headers
-8. **CORS:** Controlled cross-origin access
-9. **Data Privacy:** Sensitive fields excluded from queries
-
----
-
-#### **Q10: Explain your database schema design.**
-
-**Answer:** We have 4 main collections:
-
-1. **Users:** Stores login credentials and roles (admin/staff/customer)
-2. **Queues:** Stores queue information with lastToken and servingToken counters
-3. **QueueTokens:** Individual token records linking customer to queue
-4. **Tokens:** For managing JWT token lifecycle
-
-**Relationships:**
-
-- One Queue can have many QueueTokens (1-to-many)
-- One User can have many QueueTokens (1-to-many)
-- We use ObjectId references for relationships, similar to foreign keys in SQL
-
----
-
-#### **Q11: How do you calculate estimated wait time?**
-
-**Answer:** Simple formula:
-
-```
-Waiting People = lastToken - servingToken
-Estimated Wait Time = Waiting People × 5 minutes
-```
-
-We assume each customer takes approximately 5 minutes to serve. This can be made dynamic by tracking actual service times and calculating averages.
-
----
-
-#### **Q12: What happens if the server crashes?**
-
-**Answer:**
-
-- **Database:** All queue data is persisted in MongoDB, so nothing is lost
-- **Socket connections:** Will reconnect automatically when server restarts
-- **Tokens:** Remain valid as long as not expired
-- **Queue state:** Preserved exactly as it was before crash
-
-**Future improvement:** We can implement Redis for session management and clustering for high availability.
-
----
-
-#### **Q13: How does role-based access control work?**
-
-**Answer:** Every user has a role (admin/staff/user). Each API endpoint specifies which roles can access it using middleware.
-
-**Example:**
-
-- Only admin can create/delete queues
-- Staff and admin can call next token
-- Everyone can view queue status
-
-When a request comes in:
-
-1. Auth middleware verifies the JWT token
-2. Authorize middleware checks if user's role is allowed
-3. If yes → proceed; if no → return 404 error
-
----
-
-### **Feature Questions**
-
-#### **Q14: What features does the system have?**
-
-**Answer:**
-**For Customers:**
-
-- Join any queue without registration
-- Track token status with verification PIN
-- Real-time position updates
-- Browser notifications when turn is near
-
-**For Staff:**
-
-- Call next customer
-- Mark service as complete
-- Handle no-show customers
-- Pause/resume queues
-- Real-time monitoring
-
-**For Admin:**
-
-- Create/delete queues
-- View system-wide analytics
-- All staff features
-
----
-
-#### **Q15: How do notifications work?**
-
-**Answer:** We use two types:
-
-1. **Browser Notifications:** Using Web Notification API when token is called
-2. **Real-time Socket Updates:** Instant UI updates when queue status changes
-
-Customer must grant notification permission once. Then whenever their token is called, they get a browser notification even if the tab is in the background.
-
----
-
-#### **Q16: Can customers use the system without registration?**
-
-**Answer:** Yes! Customers don't need to create an account. They just provide their name, phone, and email when joining a queue. This makes the system accessible to everyone, including those who are not tech-savvy. Registration is only required for staff and admin roles.
-
----
-
-### **Implementation Questions**
-
-#### **Q17: Why did you choose React for frontend?**
-
-**Answer:**
-
-- **Component-based:** Reusable UI components (like QueueCard, Header)
-- **Fast rendering:** Virtual DOM makes updates efficient
-- **Large ecosystem:** Many libraries available (Material-UI, React Router)
-- **Single Page Application:** Better user experience with no page reloads
-- **Industry standard:** Most widely used frontend framework
-
----
-
-#### **Q18: Why Material-UI for design?**
-
-**Answer:**
-
-- Professional, modern design out of the box
-- Responsive components (works on mobile, tablet, desktop)
-- Accessibility features built-in
-- Consistent design language
-- Saves development time with pre-built components
-- Easy theming and customization
-
----
-
-#### **Q19: What is the purpose of middleware in your backend?**
-
-**Answer:** Middleware are functions that run between receiving a request and sending a response. We use:
-
-1. **auth:** Verifies JWT token and identifies user
-2. **authorize:** Checks if user has required role
-3. **rateLimiter:** Prevents too many requests from same IP
-4. **errorHandler:** Catches and formats errors properly
-5. **validator:** Validates input data format
-6. **sanitize:** Removes dangerous characters from input
-
----
-
-#### **Q20: How do you handle errors?**
-
-**Answer:** We use centralized error handling:
-
-- Custom AppError class for operational errors
-- Global error handler middleware catches all errors
-- Errors are logged for debugging
-- User-friendly messages sent to client
-- Different handling for development vs production
-- Proper HTTP status codes (400, 401, 404, 500, etc.)
-
----
-
-### **Scalability & Future Questions**
-
-#### **Q21: Can this system scale to handle 1000s of users?**
-
-**Answer:**
-**Current capacity:** Can handle hundreds of concurrent users.
-
-**For thousands, we need:**
-
-- Load balancer to distribute traffic across multiple servers
-- MongoDB replica set for database scalability
-- Redis for caching frequently accessed data
-- CDN for static assets
-- Clustering Node.js instances
-
-The architecture is already designed to support these additions.
-
----
-
-#### **Q22: What improvements would you make?**
-
-**Answer:**
-
-1. **SMS/Email Notifications:** Send alerts via SMS/email
-2. **Mobile App:** Native Android/iOS apps
-3. **QR Code Integration:** Scan QR to join queue
-4. **Advanced Analytics:** Service time tracking, peak hour analysis
-5. **Multi-language Support:** For diverse users
-6. **Video/Voice Calling:** Assist customers remotely
-7. **Appointment Booking:** Schedule specific time slots
-8. **Payment Integration:** For paid services
-9. **Digital Display Boards:** Show current token in office
-10. **AI-based Predictions:** Predict wait times using ML
-
----
-
-#### **Q23: How would you deploy this in production?**
-
-**Answer:**
-**Deployment Steps:**
-
-1. **Backend:** Deploy on cloud (AWS EC2, Heroku, DigitalOcean)
-2. **Frontend:** Deploy on Vercel or Netlify (static hosting)
-3. **Database:** MongoDB Atlas (cloud database)
-4. **Domain:** Register custom domain
-5. **SSL Certificate:** Enable HTTPS for security
-6. **Environment Variables:** Use proper secrets management
-7. **Monitoring:** Setup logging and monitoring tools
-8. **CI/CD:** Automated deployment pipeline
-
----
-
-### **Project Management Questions**
-
-#### **Q24: How long did it take to build?**
-
-**Answer:** This is a Minor Project developed over the 5th semester. The development was done in phases:
-
-- Week 1-2: Planning and research
-- Week 3-4: Database design and backend API
-- Week 5-6: Authentication and security implementation
-- Week 7-8: Frontend development
-- Week 9-10: Real-time features with Socket.io
-- Week 11-12: Testing and refinement
-
----
-
-#### **Q25: What challenges did you face?**
-
-**Answer:**
-
-1. **Real-time Synchronization:** Ensuring all clients get updates simultaneously
-2. **Security:** Implementing proper authentication and authorization
-3. **State Management:** Keeping frontend state in sync with backend
-4. **Error Handling:** Managing different error scenarios gracefully
-5. **UI/UX Design:** Making it simple for non-tech users
-
-**How I solved them:**
-
-- Extensive research and documentation reading
-- Breaking complex problems into smaller parts
-- Testing each feature thoroughly
-- Learning from online resources and tutorials
-
----
-
-#### **Q26: Is this a group project or individual?**
-
-**Answer:** This is submitted as a group project, but I developed the entire system individually. I handled both frontend and backend development, database design, and deployment.
-
----
-
-### **Domain-Specific Questions**
-
-#### **Q27: Why government offices specifically?**
-
-**Answer:** Government offices face unique challenges:
-
-- High volume of visitors daily
-- Limited staff resources
-- Citizens spend hours waiting
-- No transparency in queue status
-- Social distancing requirements post-pandemic
-
-This system addresses all these issues while being cost-effective and easy to implement.
-
----
-
-#### **Q28: How would this work in a government office?**
-
-**Answer:**
-**Setup:**
-
-1. Office creates queues for different services (passport, license, etc.)
-2. Staff members get login credentials
-3. Display board shows current token number
-
-**Usage:**
-
-1. Citizen arrives and gets token via mobile/computer
-2. Can wait at home or cafeteria
-3. Tracks position on phone
-4. Gets notification when turn is near
-5. Returns to counter when called
-6. Staff marks service as complete
-
----
-
-#### **Q29: What are the benefits for government offices?**
-
-**Answer:**
-
-1. **Reduced crowding:** Better space management
-2. **Efficiency:** Staff can manage queues better
-3. **Transparency:** Citizens can see queue status
-4. **Data insights:** Analytics for service improvement
-5. **Cost-effective:** Minimal hardware required
-6. **Citizen satisfaction:** Better experience
-7. **Digital India initiative:** Aligns with government's digital push
-
----
-
-### **Testing Questions**
-
-#### **Q30: How did you test the system?**
-
-**Answer:**
-
-1. **Unit Testing:** Tested individual functions
-2. **API Testing:** Used Postman to test all endpoints
-3. **Real-time Testing:** Multiple browser windows to test Socket.io
-4. **Security Testing:** Tested for common vulnerabilities
-5. **User Testing:** Friends and family tested the UI
-6. **Edge Cases:** Tested with invalid inputs, network failures
-
----
-
-## 📚 Important Technical Details
+##  Important Technical Details
 
 ### **Port Configuration**
 
@@ -1044,13 +621,13 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 ### **Socket.io Events**
 
-**Client → Server:**
+**Client  Server:**
 
 - `customer:join` - Join queue room
 - `staff:subscribe` - Subscribe to queue updates
 - `admin:subscribe` - Subscribe to all updates
 
-**Server → Client:**
+**Server  Client:**
 
 - `customer:joined` - Confirmation of queue join
 - `token:called` - Token has been called for service
@@ -1140,44 +717,8 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 ---
 
-## 🎓 Final Tips for Presentation
 
-### **Things to Remember:**
-
-1. **Start with the problem:** Always explain why this system is needed
-2. **Use simple language:** Avoid jargon, explain technical terms
-3. **Show confidence:** You built this, you know it well
-4. **Be honest:** If asked something you don't know, admit it and explain how you'd find out
-5. **Emphasize real-world use:** Government offices, hospitals, banks
-6. **Highlight security:** Show you understand secure development
-7. **Mention scalability:** Show you're thinking about growth
-8. **Prepare demo:** Have the system running for live demonstration
-
-### **Demo Flow Suggestion:**
-
-1. Show homepage with three roles
-2. Register/Login as different users
-3. Admin creates a queue
-4. Customer joins queue (show token generation)
-5. Staff view - call next token
-6. Customer notification in real-time
-7. Admin analytics dashboard
-8. Explain security features
-
-### **Key Strengths to Highlight:**
-
-✅ Full-stack development (frontend + backend + database)  
-✅ Real-time communication (Socket.io)  
-✅ Security implementation (JWT, bcrypt, rate limiting)  
-✅ Role-based access control  
-✅ Scalable architecture  
-✅ Real-world application (government offices)  
-✅ Modern tech stack (MERN + Socket.io)  
-✅ Professional UI/UX (Material-UI)
-
----
-
-## 📞 Support & Documentation
+##  Support & Documentation
 
 For any questions or issues:
 
@@ -1191,8 +732,6 @@ For any questions or issues:
 **Project Status:** Under Active Development  
 **Version:** 1.0.0  
 **Last Updated:** December 2025  
-**Academic Year:** 2025-26, Semester 5
 
 ---
 
-**Good luck with your presentation! 🚀**

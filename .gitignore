@@ -26,3 +26,6 @@ build/
 
 #editorconfig
 .copilotrules
+
+# Local Files
+README-academic.md
