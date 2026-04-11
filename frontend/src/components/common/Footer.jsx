@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Container, Link } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -17,7 +18,7 @@ const Footer = () => {
     >
       <Container maxWidth="sm">
         <Typography variant="body2" color="text.secondary" align="center">
-          {'© '}
+          {'Copyright '}
           {new Date().getFullYear()}
           {' Smart Queue Management System'}
         </Typography>
@@ -30,10 +31,10 @@ const Footer = () => {
           <Link color="inherit" href="https://github.com">
             GitHub
           </Link>{' | '}
-          <Link color="inherit" href="/privacy">
+          <Link color="inherit" component={RouterLink} to="/privacy">
             Privacy
           </Link>{' | '}
-          <Link color="inherit" href="/terms">
+          <Link color="inherit" component={RouterLink} to="/terms">
             Terms
           </Link>
         </Typography>

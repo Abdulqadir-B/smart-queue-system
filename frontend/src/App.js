@@ -11,6 +11,8 @@ import Register from './pages/Register';
 import CustomerView from './pages/CustomerView';
 import StaffView from './pages/StaffView';
 import AdminView from './pages/AdminView';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 
@@ -37,6 +39,8 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/customer" element={<CustomerView />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route 
             path="/staff" 
             element={
