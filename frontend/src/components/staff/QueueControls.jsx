@@ -4,16 +4,17 @@ import {
   CardContent,
   Typography,
   Button,
-  ButtonGroup,
   Box,
-  Divider,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   useTheme,
   TextField,
+  Stack,
+  Chip,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -143,161 +144,194 @@ const QueueControls = ({ queue }) => {
 
   if (!queue) return null;
 
-  // Calculate waiting customers
-  const waitingCount = Math.max(0, queue.lastToken - queue.servingToken);
+  const waitingCount = Math.max(0, (queue.lastToken ?? 0) - (queue.servingToken ?? 0));
 
   return (
     <>
-      <Card sx={{ mb: 4, position: 'relative' }}>
+      <Card
+        sx={{
+          mb: 4,
+          position: 'relative',
+          borderRadius: 3,
+          border: 1,
+          borderColor: 'divider',
+        }}
+      >
         {loading && (
-          <Box sx={{ position: 'absolute', width: '100%', height: '100%', zIndex: 2, backgroundColor: 'rgba(255,255,255,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <LoadingSpinner message="Processing..." />
-          </Box>
-        )}
-        
-        <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Queue: {queue.name}
-          </Typography>
-          
-          <ErrorAlert error={error} />
-          
           <Box
             sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 2,
+              borderRadius: 3,
+              backgroundColor: alpha(theme.palette.background.paper, 0.82),
+              backdropFilter: 'blur(6px)',
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
-              my: 2,
-              p: 2,
-              bgcolor: theme.palette.background.default,
-              borderRadius: 1,
             }}
           >
+            <LoadingSpinner message="Processing…" />
+          </Box>
+        )}
+
+        <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, mb: 2 }}>
             <Box>
-              <Typography variant="body2" color="text.secondary">
-                Now Serving
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.12em' }}>
+                Desk
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.25 }}>
+                {queue.name}
+              </Typography>
+            </Box>
+            <Chip
+              label={queue.isActive ? 'Accepting tokens' : 'Paused'}
+              color={queue.isActive ? 'success' : 'warning'}
+              size="small"
+              sx={{ fontWeight: 600 }}
+            />
+          </Box>
+
+          <ErrorAlert error={error} />
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1.5}
+            sx={{ mb: 3 }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                px: 2,
+                py: 2,
+                borderRadius: 2,
+                bgcolor: 'action.hover',
+                border: 1,
+                borderColor: 'divider',
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+                Now serving
               </Typography>
               {queue.servingToken >= queue.lastToken && queue.lastToken > 0 ? (
-                <Typography variant="h5" color="text.secondary" sx={{ fontWeight: 'normal' }}>
+                <Typography variant="h4" color="text.secondary" sx={{ fontWeight: 700, mt: 0.5 }}>
                   None
                 </Typography>
               ) : (
-                <Typography variant="h3" color="primary.main">
-                  {queue.servingToken === 0 ? "-" : queue.servingToken}
+                <Typography variant="h3" color="primary.main" sx={{ fontWeight: 800, mt: 0.5, lineHeight: 1.1 }}>
+                  {queue.servingToken === 0 ? '—' : queue.servingToken}
                 </Typography>
               )}
             </Box>
-            
-            <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-            
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                Last Issued
+            <Box
+              sx={{
+                flex: 1,
+                px: 2,
+                py: 2,
+                borderRadius: 2,
+                bgcolor: 'action.hover',
+                border: 1,
+                borderColor: 'divider',
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+                Last issued
               </Typography>
-              <Typography variant="h3">
-                {queue.lastToken === 0 ? "-" : queue.lastToken}
+              <Typography variant="h3" sx={{ fontWeight: 800, mt: 0.5, lineHeight: 1.1 }}>
+                {queue.lastToken === 0 ? '—' : queue.lastToken}
               </Typography>
             </Box>
-            
-            <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-            
-            <Box>
-              <Typography variant="body2" color="text.secondary">
+            <Box
+              sx={{
+                flex: 1,
+                px: 2,
+                py: 2,
+                borderRadius: 2,
+                bgcolor: 'action.hover',
+                border: 1,
+                borderColor: 'divider',
+                textAlign: 'center',
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
                 Waiting
               </Typography>
-              <Typography variant="h3" color={waitingCount > 0 ? "secondary.main" : "text.primary"}>
+              <Typography
+                variant="h3"
+                color={waitingCount > 0 ? 'secondary.main' : 'text.primary'}
+                sx={{ fontWeight: 800, mt: 0.5, lineHeight: 1.1 }}
+              >
                 {waitingCount}
               </Typography>
             </Box>
-          </Box>
-          
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Queue Controls
-            </Typography>
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-              <ButtonGroup 
-                variant="contained" 
-                aria-label="queue control buttons" 
+          </Stack>
+
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5, fontWeight: 600 }}>
+            Actions
+          </Typography>
+
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
+            <Button
+              onClick={handleCallNext}
+              startIcon={<SkipNextIcon />}
+              variant="contained"
+              color="primary"
+              size="large"
+              disabled={!queue.isActive || waitingCount === 0}
+              fullWidth
+            >
+              Call next
+            </Button>
+            <Button
+              onClick={handleTogglePause}
+              startIcon={queue.isActive ? <PauseIcon /> : <PlayArrowIcon />}
+              variant="contained"
+              color={queue.isActive ? 'warning' : 'success'}
+              size="large"
+              fullWidth
+            >
+              {queue.isActive ? 'Pause desk' : 'Resume desk'}
+            </Button>
+          </Stack>
+
+          {currentServing > 0 && (
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
+              <Button
+                onClick={handleCompleteService}
+                startIcon={<CheckCircleIcon />}
+                variant="outlined"
+                color="success"
                 size="large"
-                sx={{ 
-                  maxWidth: '600px', 
-                  width: 'auto',
-                  '& .MuiButton-root': {
-                    borderRadius: 0,
-                  },
-                  '& .MuiButton-root:first-of-type': {
-                    borderTopLeftRadius: '4px',
-                    borderBottomLeftRadius: '4px',
-                  },
-                  '& .MuiButton-root:last-of-type': {
-                    borderTopRightRadius: '4px',
-                    borderBottomRightRadius: '4px',
-                  },
-                }}
+                fullWidth
               >
-                <Button 
-                  onClick={handleCallNext}
-                  startIcon={<SkipNextIcon />}
-                  color="primary"
-                  disabled={!queue.isActive || waitingCount === 0}
-                  sx={{ px: 3, border: 'none' }}
-                >
-                  Call Next
-                </Button>
-                
-                <Button 
-                  onClick={handleTogglePause}
-                  startIcon={queue.isActive ? <PauseIcon /> : <PlayArrowIcon />}
-                  color={queue.isActive ? "warning" : "success"}
-                  sx={{ px: 3, border: 'none' }}
-                >
-                  {queue.isActive ? "Pause" : "Resume"}
-                </Button>
-              </ButtonGroup>
-            </Box>
-            
-            {currentServing > 0 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                <ButtonGroup 
-                  variant="outlined" 
-                  aria-label="service control buttons" 
-                  size="medium"
-                >
-                  <Button 
-                    onClick={handleCompleteService}
-                    startIcon={<CheckCircleIcon />}
-                    color="success"
-                    sx={{ px: 2 }}
-                  >
-                    Complete Service
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleAbandonToken}
-                    startIcon={<PersonOffIcon />}
-                    color="error"
-                    sx={{ px: 2 }}
-                  >
-                    Mark as No-show
-                  </Button>
-                </ButtonGroup>
-              </Box>
-            )}
-            
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button 
-                variant="outlined" 
-                color="error"
-                startIcon={<RestartAltIcon />}
-                onClick={() => setResetDialogOpen(true)}
-                sx={{ px: 3, width: 'auto', minWidth: '180px' }}
-              >
-                Reset Queue
+                Complete service
               </Button>
-            </Box>
-          </Box>
+              <Button
+                onClick={handleAbandonToken}
+                startIcon={<PersonOffIcon />}
+                variant="outlined"
+                color="error"
+                size="large"
+                fullWidth
+              >
+                Mark no-show
+              </Button>
+            </Stack>
+          )}
+
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<RestartAltIcon />}
+            onClick={() => setResetDialogOpen(true)}
+            fullWidth
+            size="large"
+          >
+            Reset queue
+          </Button>
         </CardContent>
       </Card>
       

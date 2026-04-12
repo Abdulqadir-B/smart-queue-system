@@ -1,24 +1,19 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { 
-  Container, 
-  Typography, 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
   Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Divider,
+  Container,
+  Grid,
   Paper,
-  Tabs,
-  Tab
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
 } from '@mui/material';
-import { 
-  AddCircleOutline as AddCircleOutlineIcon, 
-  TrackChanges as TrackChangesIcon 
-} from '@mui/icons-material';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { useQueue } from '../context/QueueContext';
 import JoinQueueForm from '../components/customer/JoinQueueForm';
 import TokenStatus from '../components/customer/TokenStatus';
+import CustomerQueuePicker from '../components/customer/CustomerQueuePicker';
 import AutoNotificationManager from '../components/customer/AutoNotificationManager';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorAlert from '../components/common/ErrorAlert';
@@ -26,139 +21,139 @@ import ErrorAlert from '../components/common/ErrorAlert';
 const CustomerView = () => {
   const { queues, loading, error, fetchQueues } = useQueue();
   const [selectedQueue, setSelectedQueue] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
-  
-  // Refs for scrolling to sections
-  const joinQueueRef = useRef(null);
-  const trackTokenRef = useRef(null);
-  
-  // Load queues on component mount
+  const [panel, setPanel] = useState('join');
+
   useEffect(() => {
-    fetchQueues(true); // Show loading on initial load only
+    fetchQueues(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency - fetchQueues is stable
-  
-  // Smooth scroll to section
-  const scrollToSection = (ref, tabIndex) => {
-    setActiveTab(tabIndex);
-    ref.current?.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'start'
-    });
-  };
-  
-  // Find the currently selected queue object - memoized to maintain stable reference
-  const currentQueue = useMemo(() => {
-    return queues.find(queue => queue.name === selectedQueue);
-  }, [queues, selectedQueue]);
-  
-  // Handle queue selection change
-  const handleQueueChange = (event) => {
-    setSelectedQueue(event.target.value);
+  }, []);
+
+  const currentQueue = useMemo(
+    () => queues.find((queue) => queue.name === selectedQueue),
+    [queues, selectedQueue]
+  );
+
+  const handlePanelChange = (_e, value) => {
+    if (value) setPanel(value);
   };
 
   return (
     <Container maxWidth="lg" className="page-container">
-      {/* Auto Notification Manager - runs in background */}
       <AutoNotificationManager />
-      
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Customer Portal
+
+      <Box
+        sx={{
+          borderRadius: 3,
+          p: { xs: 2.5, md: 3.5 },
+          mb: 3,
+          background: (theme) =>
+            theme.palette.mode === 'light'
+              ? 'linear-gradient(120deg, rgba(13,148,136,0.1) 0%, rgba(30,58,95,0.06) 100%)'
+              : 'linear-gradient(120deg, rgba(45,212,191,0.12) 0%, rgba(30,58,95,0.25) 100%)',
+          border: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.14em' }}>
+          Customer portal
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Join a queue or track your current token status.
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 0.5 }}>
+          Join a queue or track your token
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
+          Choose a service on the left, then get your token. Already checked in? Switch to Track and enter your token
+          details.
         </Typography>
       </Box>
-      
-      {/* Navigation Tabs */}
-      {!loading && queues.length > 0 && (
-        <Paper 
-          elevation={2} 
-          sx={{ 
-            mb: 4, 
-            position: 'sticky', 
-            top: 0, 
-            zIndex: 100,
-            backgroundColor: 'background.paper'
+
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          p: 0.5,
+          borderRadius: 2,
+          border: 1,
+          borderColor: 'divider',
+          display: 'inline-flex',
+          flexWrap: 'wrap',
+        }}
+      >
+        <ToggleButtonGroup
+          value={panel}
+          exclusive
+          onChange={handlePanelChange}
+          aria-label="Customer portal section"
+          sx={{
+            '& .MuiToggleButton-root': {
+              px: 2.5,
+              py: 1,
+              textTransform: 'none',
+              fontWeight: 600,
+              border: 'none',
+              borderRadius: '10px !important',
+            },
           }}
         >
-          <Tabs 
-            value={activeTab} 
-            onChange={(e, newValue) => setActiveTab(newValue)}
-            variant="fullWidth"
-            sx={{ borderBottom: 1, borderColor: 'divider' }}
-          >
-            <Tab 
-              icon={<AddCircleOutlineIcon />} 
-              label="Join a Queue" 
-              onClick={() => scrollToSection(joinQueueRef, 0)}
-              sx={{ textTransform: 'none', fontSize: '1rem' }}
-            />
-            <Tab 
-              icon={<TrackChangesIcon />} 
-              label="Track Your Token" 
-              onClick={() => scrollToSection(trackTokenRef, 1)}
-              sx={{ textTransform: 'none', fontSize: '1rem' }}
-            />
-          </Tabs>
-        </Paper>
-      )}
-      
+          <ToggleButton value="join" aria-label="Join a queue">
+            <ConfirmationNumberIcon sx={{ mr: 1, fontSize: 20 }} />
+            Join a queue
+          </ToggleButton>
+          <ToggleButton value="track" aria-label="Track token">
+            <TrackChangesIcon sx={{ mr: 1, fontSize: 20 }} />
+            Track your token
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Paper>
+
       {loading && <LoadingSpinner />}
       <ErrorAlert error={error} />
-      
+
       {!loading && queues.length === 0 && (
-        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }}>
-          No queues are currently available.
+        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
+          No queues are currently available. Please check back later.
         </Typography>
       )}
-      
-      {!loading && queues.length > 0 && (
-        <>
-          {/* Join a Queue Section */}
-          <Box ref={joinQueueRef} sx={{ mb: 4, scrollMarginTop: '100px' }}>
-            <Typography variant="h6" gutterBottom>
-              Join a Queue
-            </Typography>
-            
-            <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel>Select Queue</InputLabel>
-              <Select
-                value={selectedQueue}
-                label="Select Queue"
-                onChange={handleQueueChange}
+
+      {!loading && queues.length > 0 && panel === 'join' && (
+        <Grid container spacing={3} alignItems="flex-start">
+          <Grid item xs={12} md={5}>
+            <CustomerQueuePicker
+              queues={queues}
+              loading={loading}
+              selectedQueueName={selectedQueue}
+              onSelectQueue={setSelectedQueue}
+            />
+          </Grid>
+          <Grid item xs={12} md={7}>
+            {selectedQueue && currentQueue ? (
+              <JoinQueueForm key={selectedQueue} queue={currentQueue} />
+            ) : (
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 4,
+                  borderRadius: 3,
+                  textAlign: 'center',
+                  borderStyle: 'dashed',
+                }}
               >
-                <MenuItem value="" disabled>
-                  <em>Select a queue to join</em>
-                </MenuItem>
-                {queues.map((queue) => (
-                  <MenuItem 
-                    key={queue.name} 
-                    value={queue.name}
-                    disabled={!queue.isActive}
-                  >
-                    {queue.name} {!queue.isActive && " (Paused)"}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            {selectedQueue && (
-              <JoinQueueForm key={selectedQueue} queue={currentQueue || queues.find(q => q.name === selectedQueue)} selectedQueueName={selectedQueue} />
+                <ConfirmationNumberIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Select a queue to continue
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Pick a service from the list. You will see live counts and can request your token on this side.
+                </Typography>
+              </Paper>
             )}
-          </Box>
-          
-          <Divider sx={{ my: 4 }} />
-          
-          {/* Track Your Token Section */}
-          <Box ref={trackTokenRef} sx={{ scrollMarginTop: '100px' }}>
-            <Typography variant="h6" gutterBottom>
-              Track Your Token
-            </Typography>
-            <TokenStatus />
-          </Box>
-        </>
+          </Grid>
+        </Grid>
+      )}
+
+      {!loading && queues.length > 0 && panel === 'track' && (
+        <Box sx={{ maxWidth: 720, mx: 'auto' }}>
+          <TokenStatus />
+        </Box>
       )}
     </Container>
   );

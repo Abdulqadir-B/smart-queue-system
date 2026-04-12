@@ -16,54 +16,87 @@ export const ThemeProvider = ({ children }) => {
   const theme = useMemo(
     () =>
       createTheme({
+        shape: {
+          borderRadius: 12,
+        },
         typography: {
-          fontFamily: '"Roboto", sans-serif, Arial',
+          fontFamily: '"Roboto", "Helvetica Neue", Arial, sans-serif',
+          h1: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+          },
+          h2: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+          },
+          h3: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+          },
+          h4: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          },
+          h5: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 600,
+          },
+          h6: {
+            fontFamily: '"DM Sans", "Roboto", sans-serif',
+            fontWeight: 600,
+          },
+          subtitle1: { fontWeight: 600 },
+          button: { fontWeight: 600, letterSpacing: "0.02em" },
         },
         palette: {
           mode,
           primary: {
-            light: mode === "light" ? "#5E9EFB" : "#5E9EFB",
-            main: mode === "light" ? "#1976D2" : "#3D8BF8",
-            dark: mode === "light" ? "#0D47A1" : "#0D47A1",
+            light: mode === "light" ? "#5eead4" : "#5eead4",
+            main: mode === "light" ? "#0d9488" : "#2dd4bf",
+            dark: mode === "light" ? "#0f766e" : "#0f766e",
             contrastText: "#fff",
           },
           secondary: {
-            light: mode === "light" ? "#FF8A65" : "#FF8A65",
-            main: mode === "light" ? "#FF5722" : "#FF7043",
-            dark: mode === "light" ? "#E64A19" : "#E64A19",
+            light: mode === "light" ? "#3b5f8a" : "#64748b",
+            main: mode === "light" ? "#1e3a5f" : "#94a3b8",
+            dark: mode === "light" ? "#0f172a" : "#cbd5e1",
             contrastText: "#fff",
           },
           success: {
-            main: "#4CAF50",
+            main: mode === "light" ? "#059669" : "#34d399",
           },
           error: {
-            main: "#F44336",
+            main: mode === "light" ? "#dc2626" : "#f87171",
           },
           warning: {
-            main: "#FF9800",
+            main: mode === "light" ? "#d97706" : "#fbbf24",
           },
           info: {
-            main: "#2196F3",
+            main: mode === "light" ? "#0369a1" : "#38bdf8",
           },
           ...(mode === "light"
             ? {
                 background: {
-                  default: "#F5F7FA",
-                  paper: "#FFFFFF",
+                  default: "#f0f4f8",
+                  paper: "#ffffff",
                 },
                 text: {
-                  primary: "#1C2536",
-                  secondary: "#5F6B7C",
+                  primary: "#0f172a",
+                  secondary: "#475569",
                 },
               }
             : {
                 background: {
-                  default: "#121212",
-                  paper: "#1E1E1E",
+                  default: "#0c0f14",
+                  paper: "#151a22",
                 },
                 text: {
-                  primary: "#E6E8ED",
-                  secondary: "#9DA4AE",
+                  primary: "#e8edf4",
+                  secondary: "#94a3b8",
                 },
               }),
         },
@@ -71,15 +104,15 @@ export const ThemeProvider = ({ children }) => {
           MuiButton: {
             styleOverrides: {
               root: {
-                borderRadius: 8,
+                borderRadius: 10,
                 textTransform: "none",
-                padding: "8px 24px",
+                padding: "10px 22px",
                 boxShadow: "none",
-                fontWeight: 500,
+                fontWeight: 600,
               },
               containedPrimary: {
                 "&:hover": {
-                  boxShadow: "0px 2px 4px rgba(33, 150, 243, 0.3)",
+                  boxShadow: "0 8px 20px rgba(13, 148, 136, 0.28)",
                 },
               },
             },
@@ -88,7 +121,7 @@ export const ThemeProvider = ({ children }) => {
             styleOverrides: {
               root: {
                 "& .MuiInputBase-root": {
-                  borderRadius: 8,
+                  borderRadius: 10,
                 },
               },
             },
@@ -96,8 +129,18 @@ export const ThemeProvider = ({ children }) => {
           MuiCard: {
             styleOverrides: {
               root: {
-                borderRadius: 12,
-                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                borderRadius: 14,
+                boxShadow:
+                  mode === "light"
+                    ? "0 4px 24px rgba(15, 23, 42, 0.06)"
+                    : "0 4px 24px rgba(0, 0, 0, 0.35)",
+              },
+            },
+          },
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                backgroundImage: "none",
               },
             },
           },

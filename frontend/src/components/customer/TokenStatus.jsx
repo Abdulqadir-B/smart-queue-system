@@ -22,8 +22,10 @@ import {
   CircularProgress,
   Alert,
   Chip,
+  Stack,
 } from '@mui/material';
 import { NotificationsActive, NotificationsOff } from '@mui/icons-material';
+import CircleIcon from '@mui/icons-material/FiberManualRecord';
 import { useSocket } from '../../context/SocketContext';
 import { useQueue } from '../../context/QueueContext';
 import { getPositionInQueue, formatWaitTime, calculateEstimatedWaitTime } from '../../utils/helpers';
@@ -224,18 +226,32 @@ const TokenStatus = () => {
         autoDismiss={false}
       />
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">
-              Track Your Token
-            </Typography>
-            
-            {/* Notification Permission Status */}
+      <Card
+        sx={{
+          mb: 3,
+          borderRadius: 3,
+          border: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+            <Box>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.12em' }}>
+                Status
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>
+                Track your token
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                Enter the details from your token receipt to follow your place in line.
+              </Typography>
+            </Box>
+
             {status.isTracking && (
               <Chip
                 icon={isGranted ? <NotificationsActive /> : <NotificationsOff />}
-                label={isGranted ? 'Notifications On' : 'Notifications Off'}
+                label={isGranted ? 'Notifications on' : 'Notifications off'}
                 color={isGranted ? 'success' : 'default'}
                 size="small"
                 onClick={() => {
@@ -243,7 +259,7 @@ const TokenStatus = () => {
                     requestPermission();
                   }
                 }}
-                sx={{ cursor: isGranted ? 'default' : 'pointer' }}
+                sx={{ cursor: isGranted ? 'default' : 'pointer', flexShrink: 0 }}
               />
             )}
           </Box>
@@ -336,26 +352,70 @@ const TokenStatus = () => {
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>
-            <Paper elevation={3} sx={{ p: 3, textAlign: 'center', mb: 2 }}>
-              <Typography variant="body1">
-                Queue: <strong>{tokenInfo.queueName}</strong>
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2.5, sm: 3.5 },
+                mb: 2,
+                textAlign: 'center',
+                borderRadius: 3,
+                background: (theme) =>
+                  theme.palette.mode === 'light'
+                    ? 'linear-gradient(145deg, rgba(13,148,136,0.12) 0%, rgba(30,58,95,0.1) 100%)'
+                    : 'linear-gradient(145deg, rgba(45,212,191,0.15) 0%, rgba(30,58,95,0.35) 100%)',
+                border: 1,
+                borderColor: 'divider',
+              }}
+            >
+              <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+                <CircleIcon
+                  sx={{
+                    fontSize: 12,
+                    color: isConnected ? 'success.main' : 'text.disabled',
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  {isConnected ? 'Live updates' : 'Reconnecting…'}
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="text.secondary">
+                {tokenInfo.queueName}
               </Typography>
-              <Typography variant="h4" color="primary" sx={{ my: 2 }}>
-                Token: {tokenInfo.tokenNumber}
+              <Typography
+                variant="h2"
+                sx={{
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  my: 1.5,
+                  color: 'primary.main',
+                }}
+              >
+                {tokenInfo.tokenNumber}
               </Typography>
-              
+              <Typography variant="body2" color="text.secondary">
+                State: <strong>{status.tokenStatus || 'Unknown'}</strong>
+              </Typography>
+
               {status.customer && (
-                <Box sx={{ mb: 2, mt: 2, p: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
-                  <Typography variant="subtitle1" gutterBottom>Customer Information</Typography>
+                <Box
+                  sx={{
+                    mt: 2,
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    textAlign: 'left',
+                  }}
+                >
+                  <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 700 }}>
+                    On file
+                  </Typography>
                   <Typography variant="body2">Name: {status.customer.name}</Typography>
                   {status.customer.phone && <Typography variant="body2">Phone: {status.customer.phone}</Typography>}
                   {status.customer.email && <Typography variant="body2">Email: {status.customer.email}</Typography>}
                 </Box>
               )}
-              
-              <Typography variant="body1">
-                Status: <strong>{status.tokenStatus || 'Unknown'}</strong>
-              </Typography>
             </Paper>
 
             {status.tokenStatus === 'serving' ? (

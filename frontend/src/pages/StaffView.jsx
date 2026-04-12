@@ -1,113 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
   Box,
+  Container,
   Grid,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Divider,
-  Paper
+  Paper,
+  Typography,
 } from '@mui/material';
+import TouchAppIcon from '@mui/icons-material/TouchApp';
 import { useQueue } from '../context/QueueContext';
+import CustomerQueuePicker from '../components/customer/CustomerQueuePicker';
 import QueueControls from '../components/staff/QueueControls';
-import QueueCard from '../components/common/QueueCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorAlert from '../components/common/ErrorAlert';
 
 const StaffView = () => {
   const { queues, loading, error, fetchQueues } = useQueue();
   const [selectedQueue, setSelectedQueue] = useState('');
-  
-  // Load queues on component mount
+
   useEffect(() => {
-    fetchQueues(true); // Show loading on initial load
-    
-    // Refresh queues every 10 seconds (without showing loader)
+    fetchQueues(true);
     const intervalId = setInterval(() => fetchQueues(false), 10000);
-    
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - fetchQueues is stable from useCallback
-  
-  // Find the currently selected queue object
-  const currentQueue = queues.find(queue => queue.name === selectedQueue);
-  
-  // Handle queue selection change
-  const handleQueueChange = (event) => {
-    setSelectedQueue(event.target.value);
-  };
+  }, []);
+
+  const currentQueue = useMemo(
+    () => queues.find((q) => q.name === selectedQueue),
+    [queues, selectedQueue]
+  );
 
   return (
     <Container maxWidth="lg" className="page-container">
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Staff Portal
+      <Box
+        sx={{
+          borderRadius: 3,
+          p: { xs: 2.5, md: 3.5 },
+          mb: 3,
+          background: (theme) =>
+            theme.palette.mode === 'light'
+              ? 'linear-gradient(120deg, rgba(30,58,95,0.1) 0%, rgba(13,148,136,0.08) 100%)'
+              : 'linear-gradient(120deg, rgba(30,58,95,0.35) 0%, rgba(45,212,191,0.1) 100%)',
+          border: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.14em' }}>
+          Staff desk
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage queues and serve customers efficiently.
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 0.5 }}>
+          Run the counter
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 720 }}>
+          Pick a queue, call the next person, pause when needed, and close out service—all from one place.
         </Typography>
       </Box>
-      
+
       {loading && queues.length === 0 && <LoadingSpinner />}
       <ErrorAlert error={error} />
-      
+
       {!loading && queues.length === 0 && (
-        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }}>
-          No queues are available to manage.
+        <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
+          No queues are available to manage yet.
         </Typography>
       )}
-      
+
       {queues.length > 0 && (
-        <>
-          <Typography variant="h6" gutterBottom>
-            Queue Status Overview
-          </Typography>
-          
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            {queues.map((queue) => (
-              <Grid item xs={12} sm={6} md={4} key={queue.name}>
-                <QueueCard queue={queue} />
-              </Grid>
-            ))}
+        <Grid container spacing={3} alignItems="flex-start">
+          <Grid item xs={12} md={5}>
+            <CustomerQueuePicker
+              queues={queues}
+              loading={loading && queues.length === 0}
+              selectedQueueName={selectedQueue}
+              onSelectQueue={setSelectedQueue}
+              title="Select a queue"
+              searchPlaceholder="Search by queue name…"
+              allowPausedSelection
+            />
           </Grid>
-          
-          <Divider sx={{ my: 4 }} />
-          
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Queue Management
-            </Typography>
-            
-            <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel>Select Queue to Manage</InputLabel>
-              <Select
-                value={selectedQueue}
-                label="Select Queue to Manage"
-                onChange={handleQueueChange}
-              >
-                <MenuItem value="" disabled>
-                  <em>Select a queue to manage</em>
-                </MenuItem>
-                {queues.map((queue) => (
-                  <MenuItem key={queue.name} value={queue.name}>
-                    {queue.name} - {queue.isActive ? 'Active' : 'Paused'}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
+          <Grid item xs={12} md={7}>
             {selectedQueue && currentQueue ? (
-              <QueueControls queue={currentQueue} />
+              <QueueControls key={selectedQueue} queue={currentQueue} />
             ) : (
-              <Paper sx={{ p: 3, textAlign: 'center' }}>
-                <Typography>Select a queue to manage from the dropdown above</Typography>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 4,
+                  borderRadius: 3,
+                  textAlign: 'center',
+                  borderStyle: 'dashed',
+                }}
+              >
+                <TouchAppIcon sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Choose a queue to open controls
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Paused queues can still be selected so you can resume or inspect status.
+                </Typography>
               </Paper>
             )}
-          </Box>
-        </>
+          </Grid>
+        </Grid>
       )}
     </Container>
   );

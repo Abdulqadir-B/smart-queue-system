@@ -67,42 +67,49 @@ const CreateQueueForm = () => {
   };
 
   return (
-    <Card sx={{ mb: 4 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Create New Queue
+    <Card
+      sx={{
+        mb: 0,
+        borderRadius: 3,
+        border: 1,
+        borderColor: 'divider',
+      }}
+    >
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, maxWidth: 560 }}>
+          Names appear to customers on the join screen. Use clear desk names (e.g. Passport, Counter A).
         </Typography>
-        
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+
+        <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 480 }}>
           <TextField
-            label="Queue Name"
+            label="Queue name"
             variant="outlined"
             fullWidth
             value={queueName}
             onChange={(e) => setQueueName(sanitizeQueueName(e.target.value))}
             error={!!error}
-            helperText={error || "Use alphanumeric characters, dashes, and underscores only (2-50 chars)"}
+            helperText={error || 'Letters, numbers, dashes, underscores · 2–50 characters'}
             disabled={loading || globalLoading}
             inputProps={{ maxLength: 50 }}
             sx={{ mb: 2 }}
           />
-          
+
           <Button
             type="submit"
             variant="contained"
             color="primary"
             disabled={loading || globalLoading}
             startIcon={<AddCircleOutlineIcon />}
-            sx={{ alignSelf: 'flex-start' }}
+            size="large"
           >
-            Create Queue
+            Create queue
           </Button>
         </Box>
-        
-        {(loading || globalLoading) && <LoadingSpinner message="Creating queue..." />}
+
+        {(loading || globalLoading) && <LoadingSpinner message="Creating queue…" />}
         {globalError && <ErrorAlert error={globalError} />}
         {success && (
-          <Alert severity="success" sx={{ mt: 2 }}>
+          <Alert severity="success" sx={{ mt: 2, borderRadius: 2 }}>
             {success}
           </Alert>
         )}

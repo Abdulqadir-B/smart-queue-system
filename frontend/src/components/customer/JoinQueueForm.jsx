@@ -12,6 +12,7 @@ import {
   TextField,
   IconButton,
   Tooltip,
+  Alert,
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ErrorAlert from '../common/ErrorAlert';
@@ -243,88 +244,67 @@ const JoinQueueForm = ({ queue }) => {
 
   return (
     <>
-      <Card 
-        sx={{ 
+      <Card
+        sx={{
           mb: 3,
-          boxShadow: 3,
-          borderRadius: 2
+          borderRadius: 3,
+          border: 1,
+          borderColor: 'divider',
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Typography 
-            variant="h5" 
-            gutterBottom 
-            sx={{ 
-              textAlign: 'center',
-              fontWeight: 600,
-              mb: 3,
-              color: 'primary.main'
-            }}
-          >
-            Join {queue.name} Queue
-          </Typography>
-          
-          <ErrorAlert error={error} />
-          
-          {/* Queue Status Section */}
-          <Box 
-            sx={{ 
-              bgcolor: 'grey.50', 
-              p: 3, 
-              borderRadius: 2,
-              mb: 4,
-              border: '1px solid',
-              borderColor: 'grey.300'
-            }}
-          >
-            <Typography 
-              variant="subtitle2" 
-              sx={{ 
-                textAlign: 'center',
-                mb: 2,
-                fontWeight: 600,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                letterSpacing: 1
-              }}
-            >
-              Current Queue Status
+        <CardContent sx={{ p: { xs: 2.5, sm: 4 } }}>
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.12em' }}>
+              Get in line
             </Typography>
-            
-            <Box 
-              sx={{ 
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-                gap: 2
-              }}
-            >
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Currently Serving
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mt: 0.5 }}>
+              {queue.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Live desk snapshot before you take a token
+            </Typography>
+          </Box>
+
+          <ErrorAlert error={error} />
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 1.5,
+              mb: 4,
+            }}
+          >
+            {[
+              { label: 'Now serving', value: queue.servingToken ?? '—', accent: 'success.main' },
+              { label: 'Last token', value: queue.lastToken ?? '—', accent: 'primary.main' },
+              {
+                label: 'Waiting',
+                value: Math.max(0, (queue.lastToken ?? 0) - (queue.servingToken ?? 0)),
+                accent: 'warning.main',
+              },
+            ].map((stat) => (
+              <Box
+                key={stat.label}
+                sx={{
+                  flex: 1,
+                  px: 2,
+                  py: 2,
+                  borderRadius: 2,
+                  bgcolor: 'action.hover',
+                  border: 1,
+                  borderColor: 'divider',
+                  textAlign: 'center',
+                }}
+              >
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
+                  {stat.label}
                 </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: 'success.main' }}>
-                  {queue.servingToken}
+                <Typography variant="h4" sx={{ fontWeight: 800, color: stat.accent, lineHeight: 1.1, mt: 0.5 }}>
+                  {stat.value}
                 </Typography>
               </Box>
-              
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Last Token Issued
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: 'info.main' }}>
-                  {queue.lastToken}
-                </Typography>
-              </Box>
-              
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  People Waiting
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, color: 'warning.main' }}>
-                  {Math.max(0, queue.lastToken - queue.servingToken)}
-                </Typography>
-              </Box>
-            </Box>
+            ))}
           </Box>
           
           {/* Form Section */}
@@ -442,21 +422,9 @@ const JoinQueueForm = ({ queue }) => {
           </Box>
           
           {!queue.isActive && (
-            <Typography 
-              color="error" 
-              variant="body1" 
-              sx={{ 
-                mt: 2, 
-                textAlign: 'center',
-                fontWeight: 500,
-                bgcolor: 'error.light',
-                color: 'error.dark',
-                p: 1.5,
-                borderRadius: 1
-              }}
-            >
-              ⚠️ This queue is currently paused
-            </Typography>
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              This queue is paused. New tokens cannot be issued until staff resume the desk.
+            </Alert>
           )}
           
           {customerData.customerName.trim().length > 0 && customerData.customerName.trim().length < 3 && (
@@ -622,6 +590,14 @@ const JoinQueueForm = ({ queue }) => {
 };
 
 export default React.memo(JoinQueueForm, (prevProps, nextProps) => {
-  // Only re-render if queue name changes, not if other queue properties change
-  return prevProps.queue.name === nextProps.queue.name;
+  const pq = prevProps.queue;
+  const nq = nextProps.queue;
+  if (!pq && !nq) return true;
+  if (!pq || !nq) return false;
+  return (
+    pq.name === nq.name &&
+    pq.servingToken === nq.servingToken &&
+    pq.lastToken === nq.lastToken &&
+    pq.isActive === nq.isActive
+  );
 });

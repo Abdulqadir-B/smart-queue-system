@@ -18,7 +18,6 @@ const AnalyticsDashboard = () => {
   const [error, setError] = useState(null);
   const { socket, subscribeAsAdmin } = useSocket();
 
-  // Fetch analytics data
   const fetchAnalytics = async (showLoading = false) => {
     try {
       if (showLoading) {
@@ -36,31 +35,25 @@ const AnalyticsDashboard = () => {
     }
   };
 
-  // Subscribe as admin for real-time updates (only once when socket connects)
   useEffect(() => {
     if (socket) {
       subscribeAsAdmin();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]); // Only re-run when socket instance changes
+  }, [socket]);
 
-  // Fetch analytics on initial load
   useEffect(() => {
-    fetchAnalytics(true); // Show loading on initial load
-    
-    // Refresh analytics every minute (without showing loader)
+    fetchAnalytics(true);
     const intervalId = setInterval(() => fetchAnalytics(false), 60000);
-    
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty array - fetchAnalytics is stable
+  }, []);
 
-  // Listen for real-time updates that might affect analytics
   useEffect(() => {
     if (!socket) return;
 
     const handleQueueUpdate = () => {
-      fetchAnalytics(false); // Don't show loading on real-time updates
+      fetchAnalytics(false);
     };
 
     socket.on('queue:update', handleQueueUpdate);
@@ -73,72 +66,71 @@ const AnalyticsDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
-  // Analytics card component
   const StatCard = ({ title, value, color }) => (
     <Paper
-      elevation={3}
+      elevation={0}
+      variant="outlined"
       sx={{
-        p: 3,
-        textAlign: 'center',
+        p: 2.5,
         height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        transition: 'transform 0.2s',
+        borderRadius: 2,
+        textAlign: 'left',
+        transition: (theme) =>
+          theme.transitions.create(['box-shadow', 'border-color'], {
+            duration: theme.transitions.duration.shorter,
+          }),
         '&:hover': {
-          transform: 'translateY(-4px)',
+          borderColor: 'primary.light',
+          boxShadow: (theme) =>
+            theme.palette.mode === 'light'
+              ? '0 8px 24px rgba(15, 23, 42, 0.06)'
+              : '0 8px 24px rgba(0, 0, 0, 0.35)',
         },
       }}
     >
-      <Typography variant="h6" color="text.secondary" gutterBottom>
+      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase' }}>
         {title}
       </Typography>
-      <Typography variant="h3" sx={{ color }}>
-        {value !== undefined ? value : '-'}
+      <Typography variant="h3" sx={{ color, fontWeight: 800, mt: 0.75, lineHeight: 1.1 }}>
+        {value !== undefined ? value : '—'}
       </Typography>
     </Paper>
   );
 
   return (
-    <Card sx={{ mb: 4 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          System Analytics
+    <Card
+      sx={{
+        mb: 4,
+        borderRadius: 3,
+        border: 1,
+        borderColor: 'divider',
+      }}
+    >
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.12em' }}>
+          Overview
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5, mb: 2 }}>
+          System analytics
         </Typography>
 
-        {loading && !analytics && <LoadingSpinner message="Loading analytics..." />}
+        {loading && !analytics && <LoadingSpinner message="Loading analytics…" />}
         <ErrorAlert error={error} />
 
         {analytics && (
-          <Box sx={{ mt: 3 }}>
-            <Grid container spacing={3}>
+          <Box sx={{ mt: 1 }}>
+            <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard
-                  title="Total Queues"
-                  value={analytics.totalQueues}
-                  color="primary.main"
-                />
+                <StatCard title="Total queues" value={analytics.totalQueues} color="primary.main" />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard
-                  title="Active Queues"
-                  value={analytics.activeQueues}
-                  color="success.main"
-                />
+                <StatCard title="Active queues" value={analytics.activeQueues} color="success.main" />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard
-                  title="Total Tokens Issued"
-                  value={analytics.totalTokensIssued}
-                  color="secondary.main"
-                />
+                <StatCard title="Tokens issued" value={analytics.totalTokensIssued} color="secondary.main" />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard
-                  title="Total Served"
-                  value={analytics.totalTokensServed}
-                  color="info.main"
-                />
+                <StatCard title="Total served" value={analytics.totalTokensServed} color="info.main" />
               </Grid>
             </Grid>
           </Box>
