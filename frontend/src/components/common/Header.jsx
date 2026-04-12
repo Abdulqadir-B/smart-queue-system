@@ -70,10 +70,11 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/login');
     handleMobileMenuClose();
     handleProfileMenuClose();
+    // Leave protected routes before clearing auth, or ProtectedRoute sends users to /unauthorized (shown as "404")
+    navigate('/', { replace: true });
+    await logout();
   };
 
   const handleDeleteAccountClick = () => {
