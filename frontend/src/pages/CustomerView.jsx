@@ -108,7 +108,7 @@ const CustomerView = () => {
       {loading && <LoadingSpinner />}
       <ErrorAlert error={error} />
 
-      {!loading && queues.length === 0 && (
+      {!loading && queues.length === 0 && panel === 'join' && (
         <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
           No queues are currently available. Please check back later.
         </Typography>
@@ -150,7 +150,7 @@ const CustomerView = () => {
         </Grid>
       )}
 
-      {!loading && queues.length > 0 && panel === 'track' && (
+      {!loading && panel === 'track' && (
         <Box sx={{ maxWidth: 720, mx: 'auto' }}>
           <TokenStatus />
         </Box>

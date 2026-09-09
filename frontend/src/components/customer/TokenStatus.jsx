@@ -10,7 +10,7 @@
  * - Queue names and token numbers sanitized before API submission
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -18,6 +18,7 @@ import {
   Box,
   Paper,
   TextField,
+  MenuItem,
   Button,
   CircularProgress,
   Alert,
@@ -34,8 +35,20 @@ import useNotification from '../../hooks/useNotification';
 
 const TokenStatus = () => {
   const { socket, isConnected, subscribeAsCustomer } = useSocket();
-  const { getTokenStatus } = useQueue();
+  const { getTokenStatus, queues, fetchQueues } = useQueue();
   const isTrackingRef = useRef(false);
+
+  // Fetch queues on mount if fetchQueues is available
+  useEffect(() => {
+    if (fetchQueues) {
+      fetchQueues();
+    }
+  }, [fetchQueues]);
+
+  // Filter active queues only
+  const activeQueues = useMemo(() => {
+    return (queues || []).filter((q) => q.isActive !== false);
+  }, [queues]);
   
   // Notification system
   const { 
@@ -50,6 +63,14 @@ const TokenStatus = () => {
     tokenNumber: '',
     verificationKey: '',
   });
+
+  // Auto-select first active queue if not set
+  useEffect(() => {
+    if (!tokenInfo.queueName && activeQueues.length > 0) {
+      setTokenInfo((prev) => ({ ...prev, queueName: activeQueues[0].name }));
+    }
+  }, [activeQueues, tokenInfo.queueName]);
+
   const [status, setStatus] = useState({
     isTracking: false,
     isCalled: false,
@@ -266,78 +287,111 @@ const TokenStatus = () => {
 
           {!status.isTracking ? (
             <Box component="form" sx={{ mt: 2 }}>
-            <TextField
-              name="queueName"
-              label="Queue Name"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={tokenInfo.queueName}
-              onChange={handleChange}
-              required
-              error={!!error && !tokenInfo.queueName}
-              size="small"
-            />
-            <TextField
-              name="tokenNumber"
-              label="Token Number"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={tokenInfo.tokenNumber}
-              onChange={handleChange}
-              required
-              error={!!error && !tokenInfo.tokenNumber}
-              type="number"
-              size="small"
-            />
-            <TextField
-              name="verificationKey"
-              label="Verification Key"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={tokenInfo.verificationKey}
-              onChange={handleChange}
-              required
-              error={!!error && !tokenInfo.verificationKey}
-              type="text"
-              size="small"
-              placeholder="Enter 6-digit key"
-              helperText="Enter the 6-digit key you received when joining the queue"
-              inputProps={{ 
-                maxLength: 6,
-                pattern: '[0-9]*',
-                inputMode: 'numeric'
-              }}
-            />
-            {error && (
-              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                {error}
-              </Typography>
-            )}
-            
-            {/* Notification Permission Alert */}
-            {!isGranted && (
-              <Alert severity="info" sx={{ mt: 2 }} action={
-                <Button color="inherit" size="small" onClick={requestPermission}>
-                  Enable
-                </Button>
-              }>
-                <Typography variant="body2">
-                  Enable notifications to get alerts when it's your turn
+              {activeQueues.length === 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  No active queues are currently available to track. Please check back later.
+                </Alert>
+              )}
+              <TextField
+                select
+                name="queueName"
+                label="Select Queue"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={tokenInfo.queueName}
+                onChange={handleChange}
+                required
+                error={!!error && !tokenInfo.queueName}
+                size="small"
+                disabled={activeQueues.length === 0}
+                helperText={
+                  activeQueues.length === 0
+                    ? 'No active queues available to track'
+                    : 'Select an active queue to track your token'
+                }
+              >
+                {activeQueues.length === 0 ? (
+                  <MenuItem value="" disabled>
+                    No active queues available
+                  </MenuItem>
+                ) : (
+                  activeQueues.map((q) => (
+                    <MenuItem key={q._id || q.id || q.name} value={q.name}>
+                      {q.name}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
+              <TextField
+                name="tokenNumber"
+                label="Token Number"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={tokenInfo.tokenNumber}
+                onChange={handleChange}
+                required
+                error={!!error && !tokenInfo.tokenNumber}
+                type="number"
+                size="small"
+                sx={{
+                  '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {
+                    WebkitAppearance: 'none',
+                    margin: 0,
+                  },
+                  '& input[type=number]': {
+                    MozAppearance: 'textfield',
+                  },
+                }}
+              />
+              <TextField
+                name="verificationKey"
+                label="Verification Key"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={tokenInfo.verificationKey}
+                onChange={handleChange}
+                required
+                error={!!error && !tokenInfo.verificationKey}
+                type="text"
+                size="small"
+                placeholder="Enter 6-digit key"
+                helperText="Enter the 6-digit key you received when joining the queue"
+                inputProps={{ 
+                  maxLength: 6,
+                  pattern: '[0-9]*',
+                  inputMode: 'numeric'
+                }}
+              />
+              {error && (
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                  {error}
                 </Typography>
-              </Alert>
-            )}
-            
-            <Button
-              variant="contained"
-              color="primary"
-              size="medium"
-              sx={{ mt: 2, px: 4, py: 1 }}
-              onClick={handleStartTracking}
-              disabled={!isConnected}
-            >
+              )}
+              
+              {/* Notification Permission Alert */}
+              {!isGranted && (
+                <Alert severity="info" sx={{ mt: 2 }} action={
+                  <Button color="inherit" size="small" onClick={requestPermission}>
+                    Enable
+                  </Button>
+                }>
+                  <Typography variant="body2">
+                    Enable notifications to get alerts when it's your turn
+                  </Typography>
+                </Alert>
+              )}
+              
+              <Button
+                variant="contained"
+                color="primary"
+                size="medium"
+                sx={{ mt: 2, px: 4, py: 1 }}
+                onClick={handleStartTracking}
+                disabled={!isConnected || activeQueues.length === 0}
+              >
               Start Tracking
             </Button>
             {!isConnected && (

@@ -101,6 +101,20 @@ export const ThemeProvider = ({ children }) => {
               }),
         },
         components: {
+          MuiCssBaseline: {
+            styleOverrides: {
+              'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active': {
+                WebkitBoxShadow:
+                  mode === 'light'
+                    ? '0 0 0 100px #ffffff inset !important'
+                    : '0 0 0 100px #151a22 inset !important',
+                WebkitTextFillColor:
+                  mode === 'light' ? '#0f172a !important' : '#e8edf4 !important',
+                caretColor: mode === 'light' ? '#0f172a' : '#e8edf4',
+                transition: 'background-color 5000s ease-in-out 0s',
+              },
+            },
+          },
           MuiButton: {
             styleOverrides: {
               root: {
@@ -122,6 +136,53 @@ export const ThemeProvider = ({ children }) => {
               root: {
                 "& .MuiInputBase-root": {
                   borderRadius: 10,
+                },
+              },
+            },
+          },
+          MuiInputLabel: {
+            styleOverrides: {
+              outlined: {
+                '&.MuiInputLabel-shrink, &:has(+ .MuiInputBase-root input:-webkit-autofill), &:has(+ .MuiInputBase-root input:autofill)': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                  backgroundColor: mode === 'light' ? '#ffffff' : '#151a22',
+                  padding: '0 4px',
+                  borderRadius: '4px',
+                  zIndex: 2,
+                },
+              },
+            },
+          },
+          MuiOutlinedInput: {
+            styleOverrides: {
+              root: {
+                borderRadius: 10,
+                transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: mode === 'light' ? '#0d9488' : '#2dd4bf',
+                  borderWidth: '1.5px',
+                },
+                '&.Mui-focused': {
+                  boxShadow:
+                    mode === 'light'
+                      ? '0 0 0 3px rgba(13, 148, 136, 0.16)'
+                      : '0 0 0 3px rgba(45, 212, 191, 0.2)',
+                },
+                '&:has(input:-webkit-autofill) .MuiOutlinedInput-notchedOutline legend, &:has(input:autofill) .MuiOutlinedInput-notchedOutline legend': {
+                  maxWidth: '100%',
+                },
+              },
+              input: {
+                '&:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus, &:-webkit-autofill:active': {
+                  WebkitBoxShadow:
+                    mode === 'light'
+                      ? '0 0 0 100px #ffffff inset !important'
+                      : '0 0 0 100px #151a22 inset !important',
+                  WebkitTextFillColor:
+                    mode === 'light' ? '#0f172a !important' : '#e8edf4 !important',
+                  caretColor: mode === 'light' ? '#0f172a' : '#e8edf4',
+                  borderRadius: 'inherit',
+                  transition: 'background-color 5000s ease-in-out 0s',
                 },
               },
             },

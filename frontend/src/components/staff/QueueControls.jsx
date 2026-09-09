@@ -378,7 +378,17 @@ const QueueControls = ({ queue }) => {
               variant="outlined"
               value={tokenToComplete}
               onChange={(e) => setTokenToComplete(e.target.value)}
-              sx={{ width: '100%', maxWidth: '300px' }}
+              sx={{
+                width: '100%',
+                maxWidth: '300px',
+                '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {
+                  WebkitAppearance: 'none',
+                  margin: 0,
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield',
+                },
+              }}
             />
           </Box>
         </DialogContent>
@@ -407,7 +417,17 @@ const QueueControls = ({ queue }) => {
               label="Token Number"
               type="number"
               variant="outlined"
-              sx={{ width: '100%', maxWidth: '300px' }}
+              sx={{
+                width: '100%',
+                maxWidth: '300px',
+                '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {
+                  WebkitAppearance: 'none',
+                  margin: 0,
+                },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield',
+                },
+              }}
               value={tokenToComplete}
               onChange={(e) => setTokenToComplete(e.target.value)}
             />

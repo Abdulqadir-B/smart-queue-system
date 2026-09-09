@@ -7,7 +7,6 @@ import {
   Stack,
   Typography,
   Paper,
-  Chip,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
@@ -37,16 +36,6 @@ const Home = () => {
         <Container maxWidth="lg" className="page-container" sx={{ py: { xs: 5, md: 7 } }}>
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={7}>
-              <Chip
-                label="Smart Queue Management"
-                size="small"
-                sx={{
-                  mb: 2,
-                  fontWeight: 600,
-                  bgcolor: 'primary.main',
-                  color: 'primary.contrastText',
-                }}
-              />
               <Typography
                 variant="h2"
                 component="h1"
