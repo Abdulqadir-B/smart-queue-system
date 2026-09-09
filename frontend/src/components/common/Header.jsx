@@ -174,12 +174,13 @@ const Header = () => {
           <Typography 
             variant="h6" 
             sx={{ 
-              fontWeight: 'bold',
-              letterSpacing: '0.5px',
+              fontWeight: 800,
+              letterSpacing: '1px',
               color: 'primary.main',
+              fontSize: { xs: '1.15rem', sm: '1.3rem' },
             }}
           >
-            Smart Queue
+            SQM
           </Typography>
         </Box>
         

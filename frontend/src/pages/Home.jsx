@@ -72,12 +72,9 @@ const Home = () => {
                   size="large"
                   component={Link}
                   to="/customer"
-                  sx={{ px: 3, py: 1.25, minWidth: { sm: 200 } }}
+                  sx={{ px: 4, py: 1.25, minWidth: { sm: 200 } }}
                 >
                   Get started
-                </Button>
-                <Button variant="outlined" color="secondary" size="large" component={Link} to="/login" sx={{ px: 3 }}>
-                  Staff sign in
                 </Button>
               </Stack>
             </Grid>

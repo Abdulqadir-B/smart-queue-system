@@ -1,18 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="100" height="100" rx="20" fill="url(#grad)"/>
-  <g fill="white">
-    <!-- Queue lines -->
-    <rect x="25" y="20" width="50" height="8" rx="4"/>
-    <rect x="25" y="36" width="50" height="8" rx="4"/>
-    <rect x="25" y="52" width="50" height="8" rx="4"/>
-    <!-- Counter/ticket -->
-    <path d="M 30 70 L 70 70 L 65 85 L 35 85 Z" fill="white"/>
-    <circle cx="50" cy="77" r="3" fill="#4F46E5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="128" fill="#0F172A"/>
+  
+  <!-- Subtle Inner Border -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#1E293B" stroke-width="12"/>
+
+  <!-- Minimalist Queue Ticket Icon -->
+  <g transform="translate(0, 0)">
+    <!-- Main Ticket Body -->
+    <path d="M140 160 C140 142.327 154.327 128 172 128 L340 128 C357.673 128 372 142.327 372 160 L372 216 C354.327 216 340 230.327 340 248 C340 265.673 354.327 280 372 280 L372 352 C372 369.673 357.673 384 340 384 L172 384 C154.327 384 140 369.673 140 352 L140 280 C157.673 280 172 265.673 172 248 C172 230.327 157.673 216 140 216 Z" fill="#1E293B"/>
+    
+    <!-- Active Accent Overlay -->
+    <path d="M160 176 C160 167.163 167.163 160 176 160 L336 160 C344.837 160 352 167.163 352 176 L352 210 C338.745 214.249 328 226.797 328 248 C328 269.203 338.745 281.751 352 286 L352 336 C352 344.837 344.837 352 336 352 L176 352 C167.163 352 160 344.837 160 336 L160 286 C173.255 281.751 184 269.203 184 248 C184 226.797 173.255 214.249 160 210 Z" fill="#1976D2"/>
+    
+    <!-- Clean Ticket Lines & Number Symbol -->
+    <circle cx="256" cy="220" r="16" fill="#38BDF8"/>
+    <rect x="216" y="272" width="80" height="16" rx="8" fill="#FFFFFF"/>
+    <rect x="236" y="304" width="40" height="12" rx="6" fill="#94A3B8"/>
   </g>
 </svg>
