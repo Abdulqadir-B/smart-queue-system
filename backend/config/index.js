@@ -45,7 +45,7 @@ const config = {
     // Token generation specific limits
     tokenGenerationWindow:
       parseInt(process.env.RATE_LIMIT_TOKEN_WINDOW_MINS || "30") * 60 * 1000, // 30 minutes
-    tokenGenerationMax: parseInt(process.env.RATE_LIMIT_TOKEN_MAX || "10"), // 10 tokens per 30 minutes per queue
+    tokenGenerationMax: parseInt(process.env.RATE_LIMIT_TOKEN_MAX || "5"), // 5 tokens per 30 minutes per queue
     duplicateCheckWindow:
       parseInt(process.env.DUPLICATE_CHECK_WINDOW_HOURS || "24") * 60 * 60 * 1000, // 24 hours
   },

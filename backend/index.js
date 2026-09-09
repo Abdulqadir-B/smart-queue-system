@@ -19,6 +19,10 @@ const {
 const { setupSocketIO } = require("./services");
 
 const app = express();
+// Enable trust proxy for reverse proxies (Render, Vercel, Heroku, etc.)
+// Ensures req.ip correctly extracts the client's real IP from X-Forwarded-For
+app.set("trust proxy", 1);
+
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 

@@ -49,7 +49,7 @@ router.post(
   optionalAuth, // Optional: Link to user if authenticated
   queueNameParamValidation,
   joinQueueValidation,
-  tokenGenerationLimiter, // Per-queue rate limit: 2 tokens per hour per IP
+  tokenGenerationLimiter, // Per-queue rate limit: 5 tokens per 30 minutes per IP
   joinQueue
 ); // POST /api/queues/:name/join
 

@@ -124,7 +124,7 @@ const registrationRateLimiter = [
 // Limits token generation per IP per specific queue to prevent spam
 const tokenGenerationLimiter = rateLimit({
   windowMs: config.rateLimit.tokenGenerationWindow, // 30 minutes
-  max: config.rateLimit.tokenGenerationMax, // 10 tokens per 30 minutes per queue
+  max: config.rateLimit.tokenGenerationMax, // 5 tokens per 30 minutes per queue
   standardHeaders: true,
   legacyHeaders: false,
   // Use queue name in the key to make limits per-queue
