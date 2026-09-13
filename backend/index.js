@@ -85,11 +85,10 @@ app.use(
 
 app.use(express.json({ limit: "10mb" })); // Limit request body size
 
-// Apply input sanitization (SECURITY: Protects against NoSQL injection)
-// DISABLED: Causes issues with Express 5.x read-only query/params objects
-// app.use(mongoSanitizeMiddleware); // Removes $ and . from user input
-// app.use(sanitizeInput); // Removes dangerous HTML/JS from strings
-// Note: express-validator still provides validation protection
+// Sanitize request bodies before validation and route handlers.
+// MongoDB query/param sanitization remains disabled because Express 5 exposes
+// those objects as read-only; query and route inputs are explicitly validated.
+app.use(sanitizeInput);
 
 // Apply global rate limiting
 app.use(globalLimiter);

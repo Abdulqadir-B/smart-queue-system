@@ -84,6 +84,23 @@ if (!["development", "production", "test"].includes(config.NODE_ENV)) {
   config.NODE_ENV = "development";
 }
 
+if (config.NODE_ENV === "production") {
+  const requiredProductionVariables = [
+    "MONGODB_URI",
+    "JWT_SECRET",
+    "CORS_ORIGINS",
+  ];
+  const missingVariables = requiredProductionVariables.filter(
+    (variable) => !process.env[variable]
+  );
+
+  if (missingVariables.length > 0) {
+    throw new Error(
+      `Missing required production environment variables: ${missingVariables.join(", ")}`
+    );
+  }
+}
+
 // Log configuration in development mode
 if (config.NODE_ENV === "development") {
   console.log("Configuration:", {
