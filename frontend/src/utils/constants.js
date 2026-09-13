@@ -1,14 +1,14 @@
 // API base URL - from environment variables
 export const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 // Socket URL - from environment variables
 export const SOCKET_URL =
-  process.env.REACT_APP_SOCKET_URL || "http://localhost:5000";
+  import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
 // Queue refresh interval (in milliseconds)
 export const QUEUE_REFRESH_INTERVAL = parseInt(
-  process.env.REACT_APP_QUEUE_REFRESH_INTERVAL || "10000"
+  import.meta.env.VITE_QUEUE_REFRESH_INTERVAL || "10000"
 ); // defaults to 10 seconds
 
 // User roles

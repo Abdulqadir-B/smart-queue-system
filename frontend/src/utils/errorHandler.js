@@ -167,7 +167,7 @@ export const isServerError = (error) => {
  * @param {Error|Object} error - The error object
  */
 export const logError = (context, error) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     console.error(`[${context}] Error:`, {
       message: error.message,
       status: error.response?.status,

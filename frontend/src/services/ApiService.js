@@ -86,7 +86,7 @@ api.interceptors.response.use(
     }
 
     // Log errors (remove in production or send to logging service)
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error("API Error:", errorMessage, status);
     }
 

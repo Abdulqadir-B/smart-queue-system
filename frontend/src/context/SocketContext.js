@@ -24,21 +24,21 @@ export const SocketProvider = ({ children, authToken = null }) => {
     });
 
     socketInstance.on("connect", () => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log("Socket.io connection established");
       }
       setIsConnected(true);
     });
 
     socketInstance.on("disconnect", (reason) => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log(`Socket.io disconnected: ${reason}`);
       }
       setIsConnected(false);
     });
 
     socketInstance.on("connect_error", (error) => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Socket.io connection error:", error);
       }
       setIsConnected(false);
@@ -46,7 +46,7 @@ export const SocketProvider = ({ children, authToken = null }) => {
 
     // Listen for socket errors (e.g., authentication failures)
     socketInstance.on("error", (error) => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Socket.io error:", error);
       }
     });
