@@ -51,7 +51,7 @@ const StaffView = () => {
           Run the counter
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 720 }}>
-          Pick a queue, call the next person, pause when needed, and close out service—all from one place.
+          Pick a queue, call the next person, pause when needed, and close out service, all from one place.
         </Typography>
       </Box>
 

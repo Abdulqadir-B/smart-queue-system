@@ -51,7 +51,7 @@ const Home = () => {
                 </Box>
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 520, mb: 3, fontSize: '1.05rem' }}>
-                Get a token, track your place in real time, and get notified when it is your turn—ideal for public
+                Get a token, track your place in real time, and get notified when it is your turn, ideal for public
                 service counters and busy offices.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
