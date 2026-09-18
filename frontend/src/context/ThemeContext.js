@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useState, useMemo, useEffect } from "react";
 import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
@@ -7,7 +7,15 @@ import {
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState("light");
+  // Read from localStorage on first load; default to 'dark' for first-time visitors
+  const [mode, setMode] = useState(
+    () => localStorage.getItem("themeMode") ?? "dark"
+  );
+
+  // Persist theme preference to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("themeMode", mode);
+  }, [mode]);
 
   const toggleTheme = () => {
     setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
