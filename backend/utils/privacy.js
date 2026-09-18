@@ -53,7 +53,7 @@ const maskCustomerData = (customer) => {
   if (!customer) return null;
 
   return {
-    name: customer.name || "Anonymous",
+    name: customer.name ? maskName(customer.name) : "Anonymous",
     phone: customer.phone ? maskPhone(customer.phone) : "",
     email: customer.email ? maskEmail(customer.email) : "",
   };

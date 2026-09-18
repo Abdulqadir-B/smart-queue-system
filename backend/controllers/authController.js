@@ -3,7 +3,7 @@
  * Handles user registration, login, and logout
  */
 
-const { User } = require("../models");
+const { User, QueueToken, Token } = require("../models");
 
 /**
  * Register a new user
@@ -214,11 +214,11 @@ const deleteAccount = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Import Token model for cleanup
-    const { Token } = require("../models");
-
     // Delete all user's tokens first
     await Token.deleteMany({ user: userId });
+
+    // Delete queue tokens associated with the user
+    await QueueToken.deleteMany({ user: userId });
 
     // Delete the user account
     await User.findByIdAndDelete(userId);

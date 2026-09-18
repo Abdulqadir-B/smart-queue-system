@@ -9,7 +9,7 @@
  * @param {any} data - Optional data to log
  */
 export const logInfo = (message, data = null) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (data) {
       console.log(message, data);
     } else {
@@ -24,7 +24,7 @@ export const logInfo = (message, data = null) => {
  * @param {Error|any} error - Error object or data
  */
 export const logError = (message, error = null) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (error) {
       console.error(message, error);
     } else {
@@ -39,7 +39,7 @@ export const logError = (message, error = null) => {
  * @param {any} data - Optional data to log
  */
 export const logWarning = (message, data = null) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (data) {
       console.warn(message, data);
     } else {
@@ -54,7 +54,7 @@ export const logWarning = (message, data = null) => {
  * @param {any} data - Optional data to log
  */
 export const logDebug = (message, data = null) => {
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (data) {
       console.debug(message, data);
     } else {

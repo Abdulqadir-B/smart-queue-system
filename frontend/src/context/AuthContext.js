@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
           validateTokenSilently(storedToken, userData);
         }
       } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.error("Error parsing stored user:", error);
         }
         // Clear invalid data
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       // Token is invalid - will be handled by API interceptor
       // which will trigger auth:logout event
-      if (process.env.NODE_ENV === "development") {
+      if (import.meta.env.DEV) {
         console.log("Stored token is invalid or expired");
       }
     }
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
       const reason = event.detail?.reason;
       if (reason === "token_expired") {
         // Don't log sensitive session info in production
-        if (process.env.NODE_ENV === "development") {
+        if (import.meta.env.DEV) {
           console.log("Session expired. Redirecting to login.");
         }
       }
@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: false, message: response.data.message };
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Login error:", error);
       }
       return {
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: false, message: response.data.message };
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Register error:", error);
       }
       return {
@@ -194,7 +194,7 @@ export const AuthProvider = ({ children }) => {
         await api.post("/auth/logout");
       }
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Logout error:", error);
       }
     } finally {
@@ -233,7 +233,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: false, message: response.data.message };
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error("Delete account error:", error);
       }
       return {

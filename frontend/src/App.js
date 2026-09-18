@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { CssBaseline, Box, useTheme as useMuiTheme } from '@mui/material';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -16,7 +16,7 @@ import Terms from './pages/Terms';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 
-function AppContent() {
+function Layout() {
   const location = useLocation();
   const theme = useMuiTheme();
   
@@ -34,43 +34,59 @@ function AppContent() {
     }}>
       {showLayout && <Header />}
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/customer" element={<CustomerView />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route 
-            path="/staff" 
-            element={
-              <ProtectedRoute requiredRole={["staff", "admin"]}>
-                <StaffView />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminView />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Outlet />
       </Box>
       {showLayout && <Footer />}
     </Box>
   );
 }
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "customer", element: <CustomerView /> },
+      { path: "privacy", element: <Privacy /> },
+      { path: "terms", element: <Terms /> },
+      { 
+        path: "staff", 
+        element: (
+          <ProtectedRoute requiredRole={["staff", "admin"]}>
+            <StaffView />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: "admin", 
+        element: (
+          <ProtectedRoute requiredRole="admin">
+            <AdminView />
+          </ProtectedRoute>
+        ) 
+      },
+      { path: "unauthorized", element: <Unauthorized /> },
+      { path: "*", element: <NotFound /> }
+    ]
+  }
+], {
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true,
+  }
+});
+
 function App() {
   return (
     <AuthProvider>
       <CssBaseline />
-      <AppContent />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </AuthProvider>
   );
 }

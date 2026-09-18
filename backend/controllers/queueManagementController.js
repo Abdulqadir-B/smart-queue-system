@@ -2,7 +2,7 @@
  * Queue Management Controller
  * Handles queue creation and listing
  */
-const { Queue } = require("../models");
+const { Queue, QueueToken } = require("../models");
 const { AppError } = require("../middleware");
 
 /**
@@ -94,7 +94,8 @@ exports.deleteQueue = async (req, res, next) => {
       throw new AppError("Queue not found", 404);
     }
 
-    await Queue.deleteOne({ name });
+    await QueueToken.deleteMany({ queue: queue._id });
+    await Queue.deleteOne({ _id: queue._id });
 
     return res.status(200).json({
       status: "success",

@@ -571,16 +571,6 @@ npm start
 # Frontend will run on http://localhost:3000
 ```
 
-### **Default Admin Credentials** (After Seeding)
-
-- Email: `admin@example.com`
-- Password: `admin123`
-
-### **Default Staff Credentials** (After Seeding)
-
-- Email: `staff@example.com`
-- Password: `staff123`
-
 ---
 
 ##  Important Technical Details

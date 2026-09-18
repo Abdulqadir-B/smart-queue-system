@@ -102,7 +102,7 @@ exports.joinQueue = async (req, res, next) => {
       queue: queue._id,
       queueName: queue.name,
       tokenNumber: queue.lastToken,
-      user: req.user?.userId || null, // Link to user if authenticated
+      user: req.user?._id || null, // Link to user if authenticated
       customer: {
         name: customerName.trim(),
         phone: phone || "",
@@ -369,7 +369,6 @@ exports.getTokenStatus = async (req, res, next) => {
         queue: token.queueName,
         status: token.status,
         position,
-        customer: token.customer,
         estimatedWaitTime: token.estimatedWaitTime,
         createdAt: token.createdAt,
         calledAt: token.calledAt,
@@ -523,13 +522,13 @@ exports.abandonToken = async (req, res, next) => {
 exports.getMyActiveTokens = async (req, res, next) => {
   try {
     // Ensure user is authenticated (middleware should handle this)
-    if (!req.user || !req.user.userId) {
+    if (!req.user || !req.user._id) {
       throw new AppError("Authentication required", 401);
     }
 
     // Find all active tokens for this user
     const tokens = await QueueToken.find({
-      user: req.user.userId,
+      user: req.user._id,
       status: { $in: ["waiting", "serving"] },
     })
       .select("queueName tokenNumber verificationKey status")
