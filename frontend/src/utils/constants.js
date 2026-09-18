@@ -1,10 +1,10 @@
 // API base URL - from environment variables
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_BASE_URL || "/api";
 
 // Socket URL - from environment variables
 export const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+  import.meta.env.VITE_SOCKET_URL || "/";
 
 // Queue refresh interval (in milliseconds)
 export const QUEUE_REFRESH_INTERVAL = parseInt(
