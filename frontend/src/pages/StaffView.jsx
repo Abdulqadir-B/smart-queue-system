@@ -17,6 +17,8 @@ const StaffView = () => {
   const { queues, loading, error, fetchQueues } = useQueue();
   const [selectedQueue, setSelectedQueue] = useState('');
 
+  const queueList = useMemo(() => (Array.isArray(queues) ? queues : []), [queues]);
+
   useEffect(() => {
     fetchQueues(true);
     const intervalId = setInterval(() => fetchQueues(false), 10000);
@@ -25,8 +27,8 @@ const StaffView = () => {
   }, []);
 
   const currentQueue = useMemo(
-    () => queues.find((q) => q.name === selectedQueue),
-    [queues, selectedQueue]
+    () => queueList.find((q) => q.name === selectedQueue),
+    [queueList, selectedQueue]
   );
 
   return (
@@ -55,21 +57,21 @@ const StaffView = () => {
         </Typography>
       </Box>
 
-      {loading && queues.length === 0 && <LoadingSpinner />}
+      {loading && queueList.length === 0 && <LoadingSpinner />}
       <ErrorAlert error={error} />
 
-      {!loading && queues.length === 0 && (
+      {!loading && queueList.length === 0 && (
         <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
           No queues are available to manage yet.
         </Typography>
       )}
 
-      {queues.length > 0 && (
+      {queueList.length > 0 && (
         <Grid container spacing={3} alignItems="flex-start">
           <Grid item xs={12} md={5}>
             <CustomerQueuePicker
-              queues={queues}
-              loading={loading && queues.length === 0}
+              queues={queueList}
+              loading={loading && queueList.length === 0}
               selectedQueueName={selectedQueue}
               onSelectQueue={setSelectedQueue}
               title="Select a queue"

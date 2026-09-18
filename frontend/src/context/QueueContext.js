@@ -17,6 +17,14 @@ export const QueueProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Helper to ensure queues is always a valid array
+  const toQueueArray = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.queues)) return payload.queues;
+    return null;
+  };
+
   // Fetch all queues
   const fetchQueues = useCallback(async (showLoading = false) => {
     try {
@@ -25,10 +33,22 @@ export const QueueProvider = ({ children }) => {
       }
       setError(null);
       const response = await QueueService.getAllQueues();
-      setQueues(response.data.data);
+      const queueList = toQueueArray(response.data);
+
+      if (queueList !== null) {
+        setQueues(queueList);
+      } else {
+        setQueues([]);
+        if (typeof response.data === 'string' && response.data.includes('<!DOCTYPE')) {
+          setError('Backend unavailable or returned HTML. Ensure VITE_API_BASE_URL is configured.');
+        } else {
+          setError('Received invalid queue data format from server.');
+        }
+      }
     } catch (err) {
       setError(err.message || "Failed to fetch queues");
       logError("Error fetching queues:", err);
+      setQueues((prev) => (Array.isArray(prev) ? prev : []));
     } finally {
       if (showLoading) {
         setLoading(false);
@@ -331,7 +351,7 @@ export const QueueProvider = ({ children }) => {
   return (
     <QueueContext.Provider
       value={{
-        queues,
+        queues: Array.isArray(queues) ? queues : [],
         loading,
         error,
         fetchQueues,

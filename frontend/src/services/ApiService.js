@@ -29,6 +29,20 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
+    // Detect when an API request returned an HTML document (e.g. SPA fallback rewrite on Vercel/Netlify)
+    const contentType = response.headers?.["content-type"] || "";
+    if (
+      contentType.includes("text/html") ||
+      (typeof response.data === "string" &&
+        (response.data.trim().startsWith("<!DOCTYPE") ||
+          response.data.trim().startsWith("<html")))
+    ) {
+      return Promise.reject(
+        new Error(
+          "API returned HTML instead of JSON. Ensure VITE_API_BASE_URL is set in your Vercel environment variables to point to your backend."
+        )
+      );
+    }
     return response;
   },
   (error) => {

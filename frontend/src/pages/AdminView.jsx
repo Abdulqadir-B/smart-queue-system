@@ -20,7 +20,9 @@ const AdminView = () => {
   const { queues, loading, error, fetchQueues } = useQueue();
   const [selectedQueue, setSelectedQueue] = useState('');
 
-  const validatedSelectedQueue = queues.some((q) => q.name === selectedQueue) ? selectedQueue : '';
+  const queueList = useMemo(() => (Array.isArray(queues) ? queues : []), [queues]);
+
+  const validatedSelectedQueue = queueList.some((q) => q.name === selectedQueue) ? selectedQueue : '';
 
   useEffect(() => {
     fetchQueues(true);
@@ -36,8 +38,8 @@ const AdminView = () => {
   }, [selectedQueue, validatedSelectedQueue]);
 
   const currentQueue = useMemo(
-    () => queues.find((q) => q.name === validatedSelectedQueue),
-    [queues, validatedSelectedQueue]
+    () => queueList.find((q) => q.name === validatedSelectedQueue),
+    [queueList, validatedSelectedQueue]
   );
 
   return (

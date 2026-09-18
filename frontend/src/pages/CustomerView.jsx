@@ -23,14 +23,16 @@ const CustomerView = () => {
   const [selectedQueue, setSelectedQueue] = useState('');
   const [panel, setPanel] = useState('join');
 
+  const queueList = useMemo(() => (Array.isArray(queues) ? queues : []), [queues]);
+
   useEffect(() => {
     fetchQueues(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const currentQueue = useMemo(
-    () => queues.find((queue) => queue.name === selectedQueue),
-    [queues, selectedQueue]
+    () => queueList.find((queue) => queue.name === selectedQueue),
+    [queueList, selectedQueue]
   );
 
   const handlePanelChange = (_e, value) => {
@@ -108,17 +110,17 @@ const CustomerView = () => {
       {loading && <LoadingSpinner />}
       <ErrorAlert error={error} />
 
-      {!loading && queues.length === 0 && panel === 'join' && (
+      {!loading && queueList.length === 0 && panel === 'join' && (
         <Typography variant="h6" sx={{ textAlign: 'center', my: 4 }} color="text.secondary">
           No queues are currently available. Please check back later.
         </Typography>
       )}
 
-      {!loading && queues.length > 0 && panel === 'join' && (
+      {!loading && queueList.length > 0 && panel === 'join' && (
         <Grid container spacing={3} alignItems="flex-start">
           <Grid item xs={12} md={5}>
             <CustomerQueuePicker
-              queues={queues}
+              queues={queueList}
               loading={loading}
               selectedQueueName={selectedQueue}
               onSelectQueue={setSelectedQueue}
