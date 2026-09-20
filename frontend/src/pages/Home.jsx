@@ -27,6 +27,9 @@ const Home = () => {
       <Box
         sx={{
           position: 'relative',
+          minHeight: { xs: 'calc(100vh - 56px)', md: 'calc(100vh - 64px)' },
+          display: 'flex',
+          alignItems: 'center',
           background:
             'linear-gradient(135deg, rgba(13,148,136,0.12) 0%, rgba(30,58,95,0.08) 50%, rgba(240,244,248,0) 100%)',
           borderBottom: 1,
@@ -134,7 +137,7 @@ const Home = () => {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" className="page-container" sx={{ py: { xs: 4, md: 6 } }}>
+      <Container maxWidth="lg" component="section" className="page-container" sx={{ py: { xs: 4, md: 6 } }}>
         <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.12em' }}>
           Portals
         </Typography>
