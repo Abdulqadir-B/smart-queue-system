@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Container, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 const Footer = () => {
   return (
@@ -69,6 +70,25 @@ const Footer = () => {
               sx={{ fontSize: { xs: '0.8125rem', sm: '0.875rem' }, fontWeight: 500, '&:hover': { color: 'primary.main' } }}
             >
               Terms of Service
+            </Link>
+            <Link
+              color="text.secondary"
+              href="https://github.com/Abdulqadir-B"
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="hover"
+              aria-label="Abdulqadir B on GitHub"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                fontWeight: 500,
+                '&:hover': { color: 'primary.main' },
+              }}
+            >
+              <GitHubIcon sx={{ fontSize: '1rem' }} />
+              GitHub
             </Link>
           </Box>
         </Box>
