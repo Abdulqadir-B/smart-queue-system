@@ -48,14 +48,14 @@ const Home = () => {
                   mb: 2,
                 }}
               >
-                Skip the line.
+                Manage queues without the wait.
                 <Box component="span" sx={{ display: 'block', color: 'primary.main', mt: 0.5 }}>
-                  Join the queue from your phone.
+                  Give customers a smarter way to be served.
                 </Box>
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 520, mb: 3, fontSize: '1.05rem' }}>
-                Get a token, track your place in real time, and get notified when it is your turn, ideal for public
-                service counters and busy offices.
+                Run virtual queues for government offices, public service centers, hospitals, banks, and busy service
+                teams. Customers can join remotely, track their position, and receive timely notifications.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Button
