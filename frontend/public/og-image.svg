@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Smart Queue Management System</title>
+  <desc id="description">Virtual queue management and real-time customer updates.</desc>
+  <rect width="1200" height="630" fill="#0F172A"/>
+  <rect x="42" y="42" width="1116" height="546" rx="28" fill="#1E293B" stroke="#334155" stroke-width="4"/>
+  <circle cx="164" cy="196" r="78" fill="#1976D2"/>
+  <path d="M126 146h76c18 0 32 14 32 32v26c-18 4-28 18-28 36s10 32 28 36v42c0 18-14 32-32 32h-76c-18 0-32-14-32-32v-42c18-4 28-18 28-36s-10-32-28-36v-26c0-18 14-32 32-32z" fill="#38BDF8"/>
+  <circle cx="164" cy="204" r="10" fill="#FFFFFF"/>
+  <rect x="139" y="237" width="50" height="10" rx="5" fill="#FFFFFF"/>
+  <rect x="148" y="258" width="32" height="8" rx="4" fill="#CBD5E1"/>
+  <text x="286" y="208" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="54" font-weight="700">Smart Queue</text>
+  <text x="286" y="270" fill="#38BDF8" font-family="Arial, sans-serif" font-size="54" font-weight="700">Management System</text>
+  <text x="286" y="342" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="26">Virtual queues. Real-time updates. Smoother service.</text>
+  <rect x="286" y="405" width="286" height="8" rx="4" fill="#1976D2"/>
+</svg>

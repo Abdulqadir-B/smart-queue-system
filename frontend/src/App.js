@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import SeoMeta from './components/common/SeoMeta';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -33,6 +34,7 @@ function Layout() {
       bgcolor: theme.palette.background.default,
       color: theme.palette.text.primary
     }}>
+      <SeoMeta />
       {showLayout && <Header />}
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Outlet />
