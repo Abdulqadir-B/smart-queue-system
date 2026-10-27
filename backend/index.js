@@ -58,6 +58,7 @@ app.use(
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
+        frameAncestors: ["'self'"],
       },
     },
     // HTTP Strict Transport Security (HSTS)
@@ -68,7 +69,7 @@ app.use(
     },
     // Prevent clickjacking
     frameguard: {
-      action: "deny",
+      action: "sameorigin",
     },
     // Prevent MIME type sniffing
     noSniff: true,
@@ -82,6 +83,14 @@ app.use(
     },
   })
 );
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  );
+  next();
+});
 
 app.use(express.json({ limit: "10mb" })); // Limit request body size
 
