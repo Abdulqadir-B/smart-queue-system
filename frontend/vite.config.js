@@ -15,6 +15,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          mui: ['@mui/material', '@mui/system', '@mui/utils', '@emotion/react', '@emotion/styled'],
+          icons: ['@mui/icons-material'],
+          realtime: ['socket.io-client'],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     proxy: {

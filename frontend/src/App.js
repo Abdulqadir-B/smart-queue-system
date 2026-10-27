@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { CssBaseline, Box, useTheme as useMuiTheme } from '@mui/material';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import CustomerView from './pages/CustomerView';
-import StaffView from './pages/StaffView';
-import AdminView from './pages/AdminView';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
-import NotFound from './pages/NotFound';
-import Unauthorized from './pages/Unauthorized';
+
+const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const CustomerView = lazy(() => import('./pages/CustomerView'));
+const StaffView = lazy(() => import('./pages/StaffView'));
+const AdminView = lazy(() => import('./pages/AdminView'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Unauthorized = lazy(() => import('./pages/Unauthorized'));
 
 function Layout() {
   const location = useLocation();
@@ -86,7 +87,9 @@ function App() {
   return (
     <AuthProvider>
       <CssBaseline />
-      <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      <Suspense fallback={<Box sx={{ minHeight: '100vh' }} />}>
+        <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      </Suspense>
     </AuthProvider>
   );
 }
