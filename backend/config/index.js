@@ -65,15 +65,25 @@ function validatePort(port, defaultPort) {
 function parseOrigins(originsString, defaultOrigins) {
   if (!originsString) return defaultOrigins;
 
+  let parsedOrigins;
   try {
     // Try to parse as JSON array
-    const origins = JSON.parse(originsString);
-    if (Array.isArray(origins)) return origins;
-    return defaultOrigins;
+    parsedOrigins = JSON.parse(originsString);
   } catch (err) {
     // If not JSON, treat as comma-separated string
-    return originsString.split(",").map((origin) => origin.trim());
+    return validateOrigins(originsString.split(",").map((origin) => origin.trim()));
   }
+
+  if (Array.isArray(parsedOrigins)) return validateOrigins(parsedOrigins);
+  return defaultOrigins;
+}
+
+function validateOrigins(origins) {
+  if (origins.includes("*")) {
+    throw new Error("CORS_ORIGINS must contain explicit origins, not '*'");
+  }
+
+  return origins.filter(Boolean);
 }
 
 // Validate the NODE_ENV
