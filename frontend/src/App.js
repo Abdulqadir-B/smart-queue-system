@@ -6,6 +6,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import SeoMeta from './components/common/SeoMeta';
+import { Analytics } from '@vercel/analytics/react';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -89,6 +90,7 @@ function App() {
   return (
     <AuthProvider>
       <CssBaseline />
+      <Analytics />
       <Suspense fallback={<Box sx={{ minHeight: '100vh' }} />}>
         <RouterProvider router={router} future={{ v7_startTransition: true }} />
       </Suspense>
