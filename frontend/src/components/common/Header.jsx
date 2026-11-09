@@ -6,7 +6,6 @@
  * - No dangerouslySetInnerHTML used in this component
  * - User data (username, email) is safely rendered via JSX
  * - All user inputs are sanitized before being sent to API (see sanitize.js)
- * - displaySanitizer.js available for additional protection if needed
  */
 
 import React, { useState } from 'react';
