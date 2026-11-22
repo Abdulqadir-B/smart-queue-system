@@ -18,7 +18,7 @@ exports.joinQueue = async (req, res, next) => {
     const { name } = req.params;
     const { customerName, phone, email } = req.body || {};
 
-    const queue = await Queue.findOne({ name });
+    let queue = await Queue.findOne({ name });
     if (!queue) {
       throw new AppError("Queue not found", 404);
     }

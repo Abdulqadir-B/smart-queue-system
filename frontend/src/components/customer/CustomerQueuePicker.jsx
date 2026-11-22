@@ -48,6 +48,16 @@ const CustomerQueuePicker = ({
     <Box>
       <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5, fontWeight: 600 }}>
         {title}
+        {!loading && filtered.length > 0 && (
+          <Typography
+            component="span"
+            variant="caption"
+            color="text.secondary"
+            sx={{ ml: 0.75, fontWeight: 600 }}
+          >
+            ({filtered.length})
+          </Typography>
+        )}
       </Typography>
       <TextField
         fullWidth
@@ -70,9 +80,31 @@ const CustomerQueuePicker = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 1.5,
+          width: '100%',
           maxHeight: { xs: 'none', md: 'min(70vh, 640px)' },
           overflowY: { xs: 'visible', md: 'auto' },
-          pr: { md: 0.5 },
+          overflowX: 'hidden',
+          pr: { md: 1 },
+          mr: { md: -1 },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(148,163,184,0.55) transparent',
+          scrollbarGutter: 'stable',
+          '&::-webkit-scrollbar': {
+            width: 6,
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+            marginBlock: 4,
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(148,163,184,0.55)',
+            borderRadius: 999,
+            border: '1px solid transparent',
+            backgroundClip: 'padding-box',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: 'rgba(148,163,184,0.82)',
+          },
         }}
       >
         {loading &&
@@ -110,6 +142,9 @@ const CustomerQueuePicker = ({
                 key={queue.name}
                 variant="outlined"
                 sx={{
+                  width: '100%',
+                  flex: '0 0 auto',
+                  overflow: 'hidden',
                   borderRadius: 2,
                   borderWidth: 2,
                   borderColor: selected ? 'primary.main' : 'divider',
