@@ -31,7 +31,7 @@ Staff manage queue operations, while administrators can create queues and view s
 | dotenv              | Loads backend environment variables                                  | `backend/config/index.js`                                                                     |
 | `@vercel/analytics` | Sends frontend analytics data                                        | `frontend/src/App.js`                                                                         |
 
-The backend also declares `express-mongo-sanitize` and `validator` as dependencies. The current server code does not mount the MongoDB sanitizing middleware, and no direct source import of `validator` was found.
+The backend rejects MongoDB operator keys in request bodies, query objects, and route parameters. It also uses express-validator for field-level validation and Mongoose schemas for data constraints. No standalone MongoDB sanitization package is mounted.
 
 ## 3. Folder and File Structure
 
@@ -295,7 +295,7 @@ The backend reads variables through `backend/config/index.js`. Values are not in
 | `CORS_ORIGINS`                  | Allowed frontend origins                          | Defaults to localhost ports `3000` and `127.0.0.1:3000`; required in production |
 | `CORS_CREDENTIALS`              | Enables or disables CORS credentials              | Only the exact value `false` disables them                                      |
 | `JWT_SECRET`                    | Signs and verifies JWTs                           | Required in production                                                          |
-| `JWT_EXPIRES_IN`                | JWT lifetime                                      | Used by `backend/utils/jwt.js` when set; the code default is one hour           |
+| `JWT_EXPIRES_IN`                | JWT lifetime                                      | Used by `backend/utils/jwt.js`; the code default is 24 hours                    |
 | `RATE_LIMIT_GLOBAL_WINDOW_MINS` | Global rate-limit window                          | Defaults to `15`                                                                |
 | `RATE_LIMIT_GLOBAL_MAX`         | Maximum requests in the global window             | Defaults to `200`                                                               |
 | `RATE_LIMIT_QUEUE_WINDOW_SECS`  | Queue-action rate-limit window                    | Defaults to `60`                                                                |

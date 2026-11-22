@@ -1,571 +1,221 @@
 # Smart Queue Management System (SQM)
 
-**Primary Use Case:** Government Offices and Public Service Centers
-
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Technologies Used](#technologies-used)
-- [Key Features](#key-features)
-- [Database and Schema Design](#database-and-schema-design)
-- [Authentication and Authorization](#authentication-and-authorization)
-- [System Architecture](#system-architecture)
-- [Installation and Setup](#installation-and-setup)
-- [Important Technical Details](#important-technical-details)
-
----
-
-## Project Overview
-
-The Smart Queue Management System (SQM) is a web-based application designed to eliminate physical queues and reduce waiting time in government offices, public service centers, hospitals, banks, and other service-oriented organizations. The system allows customers to join virtual queues remotely, track their position in real-time, and receive notifications when their turn approaches.
-
-### Problem Statement
-
-- Long physical queues causing customer frustration
-- Inefficient manual queue management
-- No real-time status updates for customers
-- Difficulty in tracking service analytics
-- Crowd management issues, especially post-pandemic
-
-### Solution
-
-A digital queue management system with real-time updates, role-based access control, and comprehensive analytics to streamline service delivery and enhance customer experience.
-
----
-
-## Technologies Used
-
-### Backend Technologies
-
-| Technology | Version | Purpose |
-| --- | --- | --- |
-| **Node.js** | Latest | JavaScript runtime environment for server-side development |
-| **Express.js** | 5.1.0 | Web application framework for building RESTful APIs |
-| **MongoDB** | 8.18.3 (Mongoose) | NoSQL database for flexible data storage |
-| **Socket.io** | 4.8.1 | Real-time bidirectional communication between clients and server |
-| **JWT** | 9.0.2 | JSON Web Tokens for secure authentication |
-| **bcryptjs** | 3.0.2 | Password hashing for secure storage |
-
-### Frontend Technologies
-
-| Technology | Version | Purpose |
-| --- | --- | --- |
-| **React.js** | 18.2.0 | Component-based UI library |
-| **Vite** | 6.4.3 | Frontend build tool and development server |
-| **Material-UI (MUI)** | 5.14.19 | Modern UI component library following Material Design |
-| **React Router** | 6.20.0 | Client-side routing for single-page application |
-| **Axios** | 1.6.2 | HTTP client for API requests |
-| **Socket.io Client** | 4.7.2 | Real-time client-side communication |
-
-### Security Technologies
-
-| Technology | Purpose |
-| --- | --- |
-| **Helmet.js** | Security headers (CSP, HSTS, XSS protection) |
-| **express-rate-limit** | API rate limiting to prevent abuse |
-| **express-mongo-sanitize** | NoSQL injection prevention |
-| **express-validator** | Input validation and sanitization |
-| **CORS** | Cross-Origin Resource Sharing configuration |
-
-### Development Tools
-
-- **dotenv** - Environment variable management
-- **Validator** - String validation library
-
----
-
-## Key Features
-
-### 1. Multi-Role System
-
-- **Customer/User**: Join queues, track tokens, receive notifications
-- **Staff**: Manage queue operations, call next customer, complete/abandon tokens
-- **Admin**: Create/delete queues, view analytics, full system control
-
-### 2. Real-Time Queue Management
-
-- Live queue status updates using Socket.io
-- Instant notifications when token is called
-- Real-time position tracking in queue
-- Automatic queue status synchronization across all connected clients
-
-### 3. Token System
-
-- Unique token generation with 6-digit verification PIN
-- Token status tracking (waiting, serving, served, abandoned)
-- Estimated wait time calculation based on current queue length
-- Duplicate token prevention within 24-hour window
-- Logged-in users can view all their active tokens across queues
-
-### 4. Security Features
-
-- JWT-based authentication with secure token storage
-- Role-based access control (RBAC)
-- Password hashing using bcrypt (10 salt rounds)
-- Rate limiting on all API endpoints
-- NoSQL injection protection
-- Input validation and sanitization
-- Secure HTTP headers (Helmet.js)
-- CORS policy enforcement
-
-### 5. Queue Operations
-
-- **Create Queue**: Admins can create new service queues
-- **Join Queue**: Customers provide name, phone, email to get token
-- **Call Next**: Staff advances to next waiting customer
-- **Complete Service**: Mark current token as served
-- **Abandon Token**: Handle no-show customers
-- **Pause/Resume**: Temporarily stop queue operations
-- **Reset Queue**: Clear all tokens and restart counters
-
-### 6. Analytics Dashboard (Admin Only)
-
-- Total queues in system
-- Active queues count
-- Total tokens issued across all queues
-- Total tokens served
-- Real-time analytics updates
-
-### 7. Customer Features
-
-- Join any active queue without registration (optional login links token to account)
-- Track token status with verification key
-- View current position in queue
-- Estimated wait time display
-- Browser notifications when turn is near
-- Auto-notification manager for turn alerts
-
-### 8. Staff Features
-
-- View all assigned queues
-- Real-time queue status monitoring
-- Call next customer in queue
-- Mark service completion
-- Handle abandoned tokens
-- Pause/resume queue operations
-
-### 9. Privacy and Data Protection
-
-- Customer data masking for unauthorized views
-- Verification key required for token tracking
-- Automatic data sanitization
-- Sensitive data excluded from default queries
-
-### 10. Theme and UI
-
-- Dark mode and light mode support
-- User theme preference persisted across sessions via localStorage
-- Defaults to dark mode for first-time visitors
-
----
-
-## Database and Schema Design
-
-### Database: MongoDB (NoSQL)
-
-**Database Name:** `smart_queue`
-**Connection:** MongoDB running on `localhost:27017`
-
-### Collections
-
-| Collection | Purpose |
-| --- | --- |
-| **Users** | Stores user accounts with role, hashed password, and activity status |
-| **Queues** | Stores queue names, token counters (lastToken, servingToken), and active state |
-| **QueueTokens** | Tracks every token issued, linking customer info, queue reference, verification key, and status |
-| **Tokens** | Manages JWT token lifecycle for revocation support |
-| **Settings** | Reserved for future system-wide configuration |
-
-### Key Schema Notes
-
-- Passwords are never returned in queries (select: false) and are hashed on save via a pre-save hook
-- QueueTokens stores queueName alongside the ObjectId reference for simpler queries
-- The waiting count on a Queue is a virtual field calculated as lastToken minus servingToken
-- All frequently queried fields (role, isActive, status, verificationKey) are indexed
-
-### Schema Relationships
-
-```
-Users (1) -------- (M) QueueTokens
-  |
-  | (manages)
-  |
-Queues (1) ------- (M) QueueTokens
-  |
-  | (generates)
-  |
-QueueTokens (individual customer tokens)
-```
-
-### Indexing Strategy
-
-- **Primary Indexes**: _id (automatic)
-- **Unique Indexes**: username, email, queue name, auth token
-- **Query Indexes**: role, isActive, status, queue reference, verification key
-- **Purpose**: Fast lookups, efficient filtering, prevent duplicates
-
----
-
-## Authentication and Authorization
-
-### Authentication Flow
-
-#### 1. User Registration
-
-```
-Customer fills form -> System validates input -> Password is hashed (bcrypt)
--> User saved to database -> Success message returned
-```
-
-**Security Measures:**
-
-- Password hashed with bcrypt (cannot be reversed)
-- Email and username uniqueness validated
-- Rate limit: Max 3 registrations per 24 hours per IP
-- Input sanitization to prevent malicious data
-
----
-
-#### 2. User Login
-
-```
-User enters credentials -> System finds user by email
--> Compares hashed password -> If match, creates JWT token
--> Token sent to client -> Client stores token in localStorage
--> User logged in
-```
-
-**JWT Token Contains:**
-
-- User ID
-- Email
-- Role (admin/staff/user)
-- Expiration time (24 hours)
-
-**Security Measures:**
-
-- Only password hash compared (original password never stored)
-- Failed login attempts are rate-limited (5 attempts per hour)
-- Token expires after set time period
-- Token sent via secure HTTPS (in production)
-
----
-
-#### 3. Protected Route Access
-
-```
-User makes request -> Client sends JWT in Authorization header
--> Server verifies JWT signature -> Extracts user info from token
--> Checks if user exists and is active -> Attaches user to request
--> Proceeds to route handler
-```
-
-**Middleware Chain:**
-
-```
-Request -> auth (verify token) -> authorize(['admin', 'staff']) -> Controller
-```
-
----
-
-### Authorization (Role-Based Access Control)
-
-#### Role Hierarchy
-
-```
-Admin (highest privileges)
-
-Staff (queue management)
-
-User/Customer (basic access)
-```
-
-#### Access Control Matrix
-
-| Feature | Customer | Staff | Admin |
+A full-stack virtual queue system for government offices, hospitals, banks, and other public service centers. Customers join a queue remotely, receive a token, and follow their position in real time. Staff call and complete tokens; administrators manage queues and analytics.
+
+## Stack
+
+**Backend**
+
+- Node.js and Express 5
+- MongoDB and Mongoose
+- Socket.IO
+- JSON Web Tokens and bcryptjs
+- express-validator and express-rate-limit
+- Helmet
+
+**Frontend**
+
+- React 18
+- Vite
+- Material UI
+- React Router
+- Axios
+- Socket.IO client
+
+## Features
+
+- Public queue joining with optional account login
+- Unique token numbers and six-digit verification keys
+- Waiting, serving, served, and abandoned token states
+- Duplicate active-token check within a configurable time window
+- Estimated wait time based on queue position
+- Staff controls for calling, completing, and abandoning tokens
+- Admin queue creation, deletion, pause/resume, reset, and analytics
+- Real-time queue updates and individual customer turn notifications
+- JWT authentication and role-based access control
+- Customer, staff, and admin views
+- Light and dark themes
+- Privacy masking for customer information
+
+## Roles
+
+| Capability | Customer | Staff | Admin |
 | --- | --- | --- | --- |
-| Join Queue | Yes | Yes | Yes |
-| Track Token | Yes | Yes | Yes |
-| View Queue Status | Yes | Yes | Yes |
-| Call Next Token | No | Yes | Yes |
-| Complete Service | No | Yes | Yes |
-| Pause/Resume Queue | No | Yes | Yes |
-| Reset Queue | No | Yes | Yes |
-| Create Queue | No | No | Yes |
-| Delete Queue | No | No | Yes |
-| View Analytics | No | No | Yes |
+| Join and track queues | Yes | Yes | Yes |
+| View active tokens | Yes | Yes | Yes |
+| Call or complete tokens | No | Yes | Yes |
+| Pause, resume, or reset queues | No | Yes | Yes |
+| Create or delete queues | No | No | Yes |
+| View analytics | No | No | Yes |
 
-#### How Authorization Works
+## Queue API
 
-1. After authentication, user object is attached to request
-2. Authorization middleware checks user role
-3. If role matches required roles -> Access granted
-4. If role does not match -> 404 error (hides resource existence for security)
+Authentication uses a Bearer token:
 
----
-
-### Socket.io Authentication
-
-Real-time connections also require authentication:
-
-```
-Client connects -> Sends JWT token in handshake
--> Server verifies token -> Attaches user to socket
--> Connection established with user context
+```http
+Authorization: Bearer <jwt>
 ```
 
-**Role-Based Socket Events:**
+| Method | Route | Access |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` | Public |
+| `POST` | `/api/auth/login` | Public |
+| `GET` | `/api/auth/me` | Authenticated |
+| `POST` | `/api/queues` | Admin |
+| `GET` | `/api/queues` | Public |
+| `GET` | `/api/queues/:name/status` | Public |
+| `DELETE` | `/api/queues/:name` | Admin |
+| `POST` | `/api/queues/:name/join` | Public |
+| `GET` | `/api/queues/:name/token/:tokenNumber?verificationKey=<key>` | Public |
+| `GET` | `/api/queues/my-tokens` | Authenticated |
+| `POST` | `/api/queues/:name/next` | Staff/Admin |
+| `POST` | `/api/queues/:name/complete` | Staff/Admin |
+| `POST` | `/api/queues/:name/token/:tokenNumber/abandon` | Staff/Admin |
+| `GET` | `/api/queues/:name/tokens` | Staff/Admin |
+| `POST` | `/api/queues/:name/pause` | Staff/Admin |
+| `POST` | `/api/queues/:name/resume` | Staff/Admin |
+| `POST` | `/api/queues/:name/reset` | Staff/Admin |
+| `GET` | `/api/analytics/dashboard` | Admin |
 
-- Customers can join queue rooms (public)
-- Staff must be authenticated to subscribe to queues
-- Admins can subscribe to all system events
-- Unauthorized attempts are rejected with error messages
+The exact route names and authorization requirements are defined in `backend/routes`.
 
----
+## Real-time events
 
-## System Architecture
+Socket events use the following names:
 
-### Architecture Pattern: MVC (Model-View-Controller)
+**Client to server**
 
-```
-                    FRONTEND (React + Vite)
+- `customer:join`
+- `staff:subscribe`
+- `admin:subscribe`
 
-    Pages     Components   Context (State Mgmt)
+**Server to client**
 
-                   Services Layer
-            (ApiService, QueueService, AnalyticsService)
+- `queue:update` - queue changes such as join, next, pause, resume, or reset
+- `token:called` - a token was called in a queue
+- `token:your-turn` - sent directly to the matching customer socket
+- `error` - Socket.IO error payload
 
-                          HTTP/WebSocket
+`queue:update` includes an `action` field for the operation that changed the queue.
 
-                   BACKEND (Express)
+## Security
 
-    Routes   Controllers   Models (Mongoose)
+- Passwords are hashed with bcryptjs.
+- JWTs are verified on protected HTTP and Socket.IO requests.
+- Protected routes use role checks.
+- Queue names and token inputs use express-validator.
+- Request bodies are checked for XSS patterns.
+- Request bodies, query objects, and route parameters are rejected when MongoDB operator keys such as `$ne` or dot-key syntax are present.
+- Mongoose schemas cast and constrain field values.
+- Helmet sets security headers, including CSP and HSTS.
+- CORS uses an explicit origin configuration.
+- API and login limits reduce abuse and brute-force attempts.
+- Customer data is masked when an unauthenticated or unauthorized request tries to view it.
 
-    Middleware       Socket.io Service
-     (Auth,        (Real-time Communication)
-     Validate)
+For local development, JWTs expire after 24 hours by default. Set `JWT_EXPIRES_IN` to override the lifetime.
 
-                  MongoDB Database
-                  (smart_queue DB)
-```
+## Atomic queue counters
 
-### Request Flow Example: Join Queue
+Joining a queue and calling the next token use MongoDB atomic increments through `findOneAndUpdate`. This avoids separate read/write counter updates that could issue duplicate token numbers under concurrent requests.
 
-```
-1. Customer fills form on Frontend
+Resetting a queue also updates its counters atomically.
 
-2. React component validates input (client-side)
+## Database
 
-3. API Service sends POST request to /api/queues/:name/join
+The default database name is `smart_queue`.
 
-4. Backend receives request
+| Model | Main fields |
+| --- | --- |
+| `User` | username, email, password, role, isActive |
+| `Queue` | name, lastToken, servingToken, isActive |
+| `QueueToken` | queue, queueName, tokenNumber, customer, verificationKey, status |
+| `Token` | JWT lifecycle/revocation support |
+| `Setting` | reserved application settings |
 
-5. Middleware chain executes:
-   - Rate limiter checks request frequency
-   - Input sanitization removes dangerous characters
-   - Validation middleware checks data format
+The queue waiting count is calculated as `lastToken - servingToken`, with a minimum of zero.
 
-6. Controller (joinQueue) processes request:
-   - Finds queue in database
-   - Checks for duplicate tokens
-   - Increments queue counter
-   - Creates QueueToken document
+## Local setup
 
-7. Socket.io broadcasts update to all connected clients
+### Requirements
 
-8. Response sent back to client with token details
+- Node.js 18 or newer
+- MongoDB 6 or newer
+- npm
 
-9. Frontend displays token number and verification key
-```
-
-### Real-Time Communication Flow
-
-```
-Staff calls next token:
-  Backend updates database -> Socket.io emits event
-   -> All customers listening to that queue receive update
-   -> Customer whose token was called gets notification
-   -> UI updates automatically
-```
-
----
-
-## Installation and Setup
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
-- npm package manager
-
-### Backend Setup
+### Backend
 
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Install dependencies
 npm install
-
-# Create .env file with the following variables:
-PORT=5000
-MONGODB_URI=mongodb://127.0.0.1:27017/smart_queue
-JWT_SECRET=your-secret-key-here
-NODE_ENV=development
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-
-# Start MongoDB service
-# Windows: Open MongoDB Compass or run the mongod service
-# Linux/Mac: sudo systemctl start mongod
-
-# Run the backend server
-npm start
 ```
 
-### Frontend Setup
+Create `backend/.env`:
+
+```env
+NODE_ENV=development
+PORT=5000
+HOST=0.0.0.0
+MONGODB_URI=mongodb://127.0.0.1:27017/smart_queue
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=24h
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+CORS_CREDENTIALS=true
+RATE_LIMIT_GLOBAL_WINDOW_MINS=15
+RATE_LIMIT_GLOBAL_MAX=200
+RATE_LIMIT_QUEUE_WINDOW_SECS=60
+RATE_LIMIT_QUEUE_MAX=30
+RATE_LIMIT_TOKEN_WINDOW_MINS=30
+RATE_LIMIT_TOKEN_MAX=5
+DUPLICATE_CHECK_WINDOW_HOURS=24
+```
+
+Start the API:
 
 ```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the development server
 npm start
-
-# Frontend will run on http://localhost:5173
 ```
 
----
+The backend listens on `http://localhost:5000` by default.
 
-## Important Technical Details
+### Frontend
 
-### Port Configuration
-
-- **Backend:** http://localhost:5000
-- **Frontend:** http://localhost:5173
-- **MongoDB:** mongodb://127.0.0.1:27017
-
-### Environment Variables Required
-
-```
-PORT=5000
-MONGODB_URI=mongodb://127.0.0.1:27017/smart_queue
-JWT_SECRET=your-secret-key-here
-NODE_ENV=development
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```bash
+cd frontend
+npm install
+npm start
 ```
 
-### Rate Limits
+The Vite app listens on `http://localhost:3000` or the port reported by Vite.
 
-- **Global API:** 200 requests per 15 minutes per IP
-- **Login:** 5 failed attempts per hour
-- **Registration:** 3 successful registrations per 24 hours per IP
-- **Token Generation:** 5 tokens per 30 minutes per queue per IP
-- **Queue Actions:** 30 requests per minute
-- **Token Status Checks:** Separate rate limiter applied
+Set `VITE_API_BASE_URL` and `VITE_SOCKET_URL` in `frontend/.env` when they differ from the local defaults.
 
-### JWT Token Expiry
+## Environment notes
 
-- Access tokens expire after 24 hours
-- Configurable in JWT utility
+- `JWT_SECRET` is required. Generate a separate production secret rather than using a development value.
+- `MONGODB_URI` is required outside local development.
+- `CORS_ORIGINS` accepts comma-separated origins.
+- `JWT_EXPIRES_IN` accepts JSON Web Token duration strings such as `24h` or `1h`.
+- Rate limits and the duplicate-token window can be tuned through environment variables.
 
-### Password Security
+## Project layout
 
-- Bcrypt salt rounds: 10
-- Minimum password length: 6 characters (configurable in validators)
+```text
+backend/
+  controllers/
+  middleware/
+  models/
+  routes/
+  services/
+  utils/
+  validators/
 
-### Socket.io Events
+frontend/src/
+  components/
+  context/
+  hooks/
+  pages/
+  services/
+  utils/
+```
 
-**Client to Server:**
-
-- `customer:join` - Join queue room
-- `staff:subscribe` - Subscribe to queue updates
-- `admin:subscribe` - Subscribe to all updates
-
-**Server to Client:**
-
-- `customer:joined` - Confirmation of queue join
-- `token:called` - Token has been called for service
-- `queue:update` - Queue status updated (pause/resume/reset)
-- `error` - Error message
-
-### API Endpoints
-
-**Auth Routes:**
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user profile (protected)
-- `POST /api/auth/logout` - Logout current user (protected)
-- `DELETE /api/auth/delete-account` - Delete user account (protected)
-
-**Queue Management Routes:**
-
-- `POST /api/queues` - Create queue (admin only)
-- `GET /api/queues` - List all queues
-- `GET /api/queues/:name/status` - Get queue status
-- `DELETE /api/queues/:name` - Delete queue (admin only)
-
-**Token Routes:**
-
-- `GET /api/queues/my-tokens` - Get logged-in user active tokens (protected)
-- `POST /api/queues/:name/join` - Join queue and receive a token
-- `GET /api/queues/:name/token/:tokenNumber` - Get token status (requires verificationKey query param)
-- `POST /api/queues/:name/next` - Call next token (staff/admin)
-- `POST /api/queues/:name/complete` - Mark current token as served (staff/admin)
-- `POST /api/queues/:name/token/:tokenNumber/abandon` - Mark token as abandoned (staff/admin)
-- `GET /api/queues/:name/tokens` - List all tokens for a queue (staff/admin)
-
-**Queue State Routes:**
-
-- `POST /api/queues/:name/pause` - Pause queue (staff/admin)
-- `POST /api/queues/:name/resume` - Resume queue (staff/admin)
-- `POST /api/queues/:name/reset` - Reset queue (staff/admin)
-
-**Analytics Routes:**
-
-- `GET /api/analytics/counts` - Get system-wide analytics counts (admin only)
-
-### File Structure
-
-**Backend:**
-
-- `models/` - Mongoose schemas (User, Queue, QueueToken, Token, Setting)
-- `controllers/` - Business logic (auth, queue management, queue state, tokens, analytics)
-- `routes/` - API endpoint definitions (authRoutes, queueManagementRoutes, queueStateRoutes, tokenRoutes, analyticsRoutes)
-- `middleware/` - Auth, authorization, rate limiting, error handler, sanitize
-- `services/` - Socket.io real-time service
-- `utils/` - JWT utilities, privacy functions
-- `validators/` - Input validation rules
-- `config/` - Configuration management
-
-**Frontend:**
-
-- `pages/` - Main views (Home, Login, Register, CustomerView, StaffView, AdminView, Privacy, Terms, NotFound, Unauthorized)
-- `components/` - Reusable UI components split by role (admin/, staff/, customer/, common/)
-- `context/` - React Context for state management (AuthContext, QueueContext, SocketContext, ThemeContext)
-- `services/` - API service layer (ApiService, QueueService, AnalyticsService)
-- `utils/` - Helper functions, constants, error handler, sanitizer, logger
-- `hooks/` - Custom React hooks (useNotification)
-
-### Key Design Patterns Used
-
-1. **MVC (Model-View-Controller):** Separation of concerns
-2. **Repository Pattern:** Models handle database operations
-3. **Middleware Chain:** Sequential request processing
-4. **Factory Pattern:** Middleware factories (authorize, rate limiters)
-5. **Context API:** React state management
-6. **Service Layer:** Abstraction of API calls
-7. **Custom Hooks:** Reusable React logic
-
----
-
-**Project Status:** Under Active Development
-**Version:** 1.0.0
-**Last Updated:** September 2026
-
----
+Additional implementation notes are in [ARCHITECTURE.md](ARCHITECTURE.md).
