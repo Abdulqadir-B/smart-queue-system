@@ -62,8 +62,13 @@ QueueSchema.methods = {
    * @returns {Number} New token number
    */
   async issueToken() {
-    this.lastToken += 1;
-    await this.save();
+    const updated = await this.constructor.findOneAndUpdate(
+      { _id: this._id, isActive: true },
+      { $inc: { lastToken: 1 } },
+      { new: true, runValidators: true }
+    );
+    if (!updated) return null;
+    this.lastToken = updated.lastToken;
     return this.lastToken;
   },
 
@@ -72,10 +77,17 @@ QueueSchema.methods = {
    * @returns {Number} New serving token
    */
   async callNextToken() {
-    if (this.servingToken < this.lastToken) {
-      this.servingToken += 1;
-      await this.save();
-    }
+    const updated = await this.constructor.findOneAndUpdate(
+      {
+        _id: this._id,
+        isActive: true,
+        $expr: { $lt: ["$servingToken", "$lastToken"] },
+      },
+      { $inc: { servingToken: 1 } },
+      { new: true, runValidators: true }
+    );
+    if (!updated) return null;
+    this.servingToken = updated.servingToken;
     return this.servingToken;
   },
 };

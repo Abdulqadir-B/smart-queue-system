@@ -84,9 +84,15 @@ exports.joinQueue = async (req, res, next) => {
       });
     }
 
-    // Increment token number
-    queue.lastToken += 1;
-    await queue.save();
+    // Atomically increment the counter so concurrent joins receive unique numbers.
+    queue = await Queue.findOneAndUpdate(
+      { _id: queue._id, isActive: true },
+      { $inc: { lastToken: 1 } },
+      { new: true, runValidators: true }
+    );
+    if (!queue) {
+      throw new AppError("Queue is currently paused", 423);
+    }
 
     // Calculate estimated wait time (simple calculation: 5 minutes per waiting customer)
     const waitingCount = queue.lastToken - queue.servingToken;
@@ -184,9 +190,37 @@ exports.callNext = async (req, res, next) => {
       });
     }
 
-    // Increment serving token
-    queue.servingToken += 1;
-    await queue.save();
+    // Atomically advance the serving counter.
+    const updatedQueue = await Queue.findOneAndUpdate(
+      {
+        _id: queue._id,
+        isActive: true,
+        $expr: { $lt: ["$servingToken", "$lastToken"] },
+      },
+      { $inc: { servingToken: 1 } },
+      { new: true, runValidators: true }
+    );
+    if (!updatedQueue) {
+      const socketService = req.app.get("socketService");
+      if (socketService) {
+        socketService.emitQueueUpdate(name, {
+          action: "next",
+          servingToken: queue.servingToken,
+          lastToken: queue.lastToken,
+          waiting: 0,
+          message: "No waiting customers",
+        });
+      }
+      return res.status(200).json({
+        status: "success",
+        message: "No waiting customers",
+        data: {
+          serving: queue.servingToken,
+          lastToken: queue.lastToken,
+        },
+      });
+    }
+    queue = updatedQueue;
 
     // Find and update the token record
     const token = await QueueToken.findOne({

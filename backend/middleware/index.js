@@ -17,7 +17,7 @@ const { auth, optionalAuth } = require("./auth");
 const authorize = require("./authorize");
 const {
   sanitizeInput,
-  mongoSanitizeMiddleware,
+  rejectNoSqlInjection,
   sanitizeString,
   sanitizeObject,
 } = require("./sanitize");
@@ -44,7 +44,7 @@ module.exports = {
 
   // Input sanitization
   sanitizeInput,
-  mongoSanitizeMiddleware,
+  rejectNoSqlInjection,
   sanitizeString,
   sanitizeObject,
 };

@@ -8,12 +8,12 @@ const jwt = require("jsonwebtoken");
 /**
  * Generate JWT token for a user
  * @param {Object} payload - Data to encode in token (userId, role, etc.)
- * @param {String} expiresIn - Token expiry time (default: 1h)
+ * @param {String} expiresIn - Token expiry time (default: 24h)
  * @returns {String} JWT token
  */
 const generateToken = (
   payload,
-  expiresIn = process.env.JWT_EXPIRES_IN || "1h"
+  expiresIn = process.env.JWT_EXPIRES_IN || "24h"
 ) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");

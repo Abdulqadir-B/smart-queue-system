@@ -1,9 +1,7 @@
 /**
  * Input Sanitization Middleware
- * Protects against XSS and NoSQL injection attacks
+ * Protects against XSS and rejects MongoDB operator keys
  */
-
-const mongoSanitize = require("express-mongo-sanitize");
 
 /**
  * Simple XSS sanitization for strings
@@ -59,9 +57,9 @@ const sanitizeObject = (obj) => {
 };
 
 /**
- * Middleware to sanitize request body, query, and params
- * Protects against XSS attacks
- * Note: Only body is fully sanitized as query/params may be read-only in some Express versions
+ * Middleware to sanitize request bodies.
+ * Express 5 exposes query objects as read-only, so NoSQL key checks are handled
+ * centrally for body, query, and params instead of trying to rewrite the request.
  */
 const sanitizeInput = (req, res, next) => {
   // Sanitize body (most important - where POST data comes from)
@@ -69,26 +67,42 @@ const sanitizeInput = (req, res, next) => {
     req.body = sanitizeObject(req.body);
   }
 
-  // Note: mongoSanitizeMiddleware already handles query and params for NoSQL injection
-  // XSS in query/params is less risky as they're typically used for routing/filtering
-
   next();
 };
 
 /**
- * Configure MongoDB sanitization
- * Removes $ and . from user input to prevent NoSQL injection
+ * Reject MongoDB operators in request data.
+ * Keys containing "$" or "." could otherwise be interpreted by MongoDB when
+ * request objects are passed into queries.
  */
-const mongoSanitizeMiddleware = mongoSanitize({
-  replaceWith: "_", // Replace prohibited characters with underscore
-  onSanitize: ({ req, key }) => {
-    console.warn(`Potential NoSQL injection attempt detected in ${key}`);
-  },
-});
+const hasProhibitedKeys = (value) => {
+  if (!value || typeof value !== "object") return false;
+  if (Array.isArray(value)) {
+    return value.some(hasProhibitedKeys);
+  }
+
+  return Object.keys(value).some((key) =>
+    key.includes("$") || key.includes(".") || hasProhibitedKeys(value[key])
+  );
+};
+
+const rejectNoSqlInjection = (req, res, next) => {
+  if (
+    hasProhibitedKeys(req.body) ||
+    hasProhibitedKeys(req.query) ||
+    hasProhibitedKeys(req.params)
+  ) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid request data",
+    });
+  }
+  next();
+};
 
 module.exports = {
   sanitizeInput,
-  mongoSanitizeMiddleware,
+  rejectNoSqlInjection,
   sanitizeString,
   sanitizeObject,
 };

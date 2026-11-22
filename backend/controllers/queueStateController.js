@@ -94,17 +94,17 @@ exports.resumeQueue = async (req, res, next) => {
 exports.resetQueue = async (req, res, next) => {
   try {
     const { name } = req.params;
-    const queue = await Queue.findOne({ name });
+    const queue = await Queue.findOneAndUpdate(
+      { name },
+      { $set: { lastToken: 0, servingToken: 0 } },
+      { new: true, runValidators: true }
+    );
     if (!queue) {
       throw new AppError("Queue not found", 404);
     }
-    
-    // Delete all tokens for this queue
+
+    // Delete all tokens for this queue after resetting the counters atomically.
     const deleteResult = await QueueToken.deleteMany({ queueName: queue.name });
-    
-    queue.lastToken = 0;
-    queue.servingToken = 0;
-    await queue.save();
 
     // Get socket.io instance
     const io = req.app.get("socketio");

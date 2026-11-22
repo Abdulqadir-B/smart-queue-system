@@ -13,7 +13,7 @@ const {
   notFoundHandler, 
   globalLimiter, 
   sanitizeInput, 
-  mongoSanitizeMiddleware 
+  rejectNoSqlInjection
 } = require("./middleware");
 // Import socket service
 const { setupSocketIO } = require("./services");
@@ -94,9 +94,8 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "10mb" })); // Limit request body size
 
-// Sanitize request bodies before validation and route handlers.
-// MongoDB query/param sanitization remains disabled because Express 5 exposes
-// those objects as read-only; query and route inputs are explicitly validated.
+// Reject MongoDB operator keys before validation and sanitize body text.
+app.use(rejectNoSqlInjection);
 app.use(sanitizeInput);
 
 // Apply global rate limiting
